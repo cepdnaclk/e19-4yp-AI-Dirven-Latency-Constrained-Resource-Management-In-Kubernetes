@@ -3,8 +3,8 @@ layout: home
 permalink: index.html
 
 # Please update this with your repository name and title
-repository-name: eYY-4yp-project-template
-title:
+repository-name: e19-4yp-Dynamic-Multi-Dimensional-Resource-Orchestration-in-Kubernetes
+title: Dynamic Multi Dimensional Resource Orchestration in Kubernetes
 ---
 
 [comment]: # "This is the standard layout for the project, but you can clean this and use your own template"
@@ -13,14 +13,15 @@ title:
 
 #### Team
 
-- eNumber, Name, [email](mailto:name@email.com)
-- eNumber, Name, [email](mailto:name@email.com)
-- eNumber, Name, [email](mailto:name@email.com)
+- E/19/003, Abeysinghe A.M.H.P., [e19003@eng.pdn.ac.lk](mailto:name@email.com)
+- E/19/155, Jayarathna B.R.U.K., [e19155@eng.pdn.ac.lk](mailto:name@email.com)
+- E/19/166, Jayathunga W.W.K., [e19166@eng.pdn.ac.lk](mailto:name@email.com)
 
 #### Supervisors
 
-- Name, [email](mailto:name@eng.pdn.ac.lk)
-- Name, [email](mailto:name@eng.pdn.ac.lk)
+- Prof. Roshan Ragel, [roshanr@eng.pdn.ac.lk](mailto:name@eng.pdn.ac.lk)
+- Dr. Isuru Nawinne, [isurunawinne@eng.pdn.ac.lk](mailto:name@eng.pdn.ac.lk)
+- Dr. Malith Jayasinghe, [malithj@wso2.com](mailto:name@eng.pdn.ac.lk)
 
 #### Table of content
 
