@@ -1,8 +1,17 @@
-PROMETHEUS_URL = "http://localhost:9090"
-PROMETHEUS_QUERY_CPU = 'rate(container_cpu_usage_seconds_total{container!="POD"}[5m])'
-NAMESPACE = "default"
-DEPLOYMENT_NAME = "ourdeployment"
-CONTAINER_NAME = "our-container"
+SERVICES = [
+    {
+        "name": "service-1-deployment",
+        "container": "service-1-container",
+        "namespace": "default"
+    },
+    {
+        "name": "service-2-deployment",
+        "container": "service-2-container",
+        "namespace": "default"
+    }
+]
+
 CPU_THRESHOLD = 0.8
-CPU_INCREMENT = 0.1  # in cores
+CPU_INCREMENT = 0.1
 MAX_CPU_LIMIT = 1.0
+PROMETHEUS_URL = "http://localhost:9090"

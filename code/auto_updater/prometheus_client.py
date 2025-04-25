@@ -6,3 +6,6 @@ def query_prometheus(query):
     response.raise_for_status()
     results = response.json()["data"]["result"]
     return results
+
+def get_cpu_query(container_name):
+    return f'rate(container_cpu_usage_seconds_total{{container="{container_name}"}}[5m])'
