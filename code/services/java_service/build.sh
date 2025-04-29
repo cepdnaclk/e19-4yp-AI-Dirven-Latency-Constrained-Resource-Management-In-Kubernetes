@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script to build the Docker image
-IMAGE_NAME="primemicroservice"
+IMAGE_NAME="service-1-image"
 
 echo "Building Docker image: $IMAGE_NAME"
 docker build -t $IMAGE_NAME .
