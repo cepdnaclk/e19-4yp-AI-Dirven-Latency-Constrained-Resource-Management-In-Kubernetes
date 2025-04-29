@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: service-2-container
-          image: service-2-image:1.0
+          image: service-2-image:latest
           ports:
             - containerPort: 3002
           resources:
