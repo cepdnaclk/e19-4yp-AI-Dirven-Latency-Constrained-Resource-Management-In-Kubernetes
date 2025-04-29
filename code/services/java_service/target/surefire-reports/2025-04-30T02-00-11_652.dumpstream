@@ -1,0 +1,5 @@
+# Created at 2025-04-30T02:00:11.777
+Boot Manifest-JAR contains absolute paths in classpath 'D:\Research\research git\e19-4yp-Dynamic-Multi-Dimensional-Resource-Orchestration-in-Kubernetes\code\services\java_service\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+
