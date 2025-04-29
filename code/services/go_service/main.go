@@ -14,8 +14,8 @@ type PrimeResponse struct {
 func main() {
 	http.HandleFunc("/isPrime", isPrimeHandler)
 
-	// Start server on port 8080
-	http.ListenAndServe(":8080", nil)
+	// Start server on port 3002
+	http.ListenAndServe(":3002", nil)
 }
 
 func isPrimeHandler(w http.ResponseWriter, r *http.Request) {
