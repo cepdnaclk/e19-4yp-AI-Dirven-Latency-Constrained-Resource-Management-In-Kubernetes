@@ -4,7 +4,7 @@
 IMAGE_NAME="service-1-image"
 
 echo "Building Docker image: $IMAGE_NAME"
-docker build -t $IMAGE_NAME .
+docker build --no-cache -t $IMAGE_NAME .
 
 # Check if the build was successful
 if [ $? -eq 0 ]; then
