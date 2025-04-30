@@ -49,7 +49,7 @@
           <stringProp name="HTTPSampler.response_timeout"></stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.domain">localhost</stringProp>
-          <stringProp name="HTTPSampler.port">3002</stringProp>
+          <stringProp name="HTTPSampler.port">3001</stringProp>
           <stringProp name="HTTPSampler.path">/isPrime?number=29</stringProp>
         </HTTPSamplerProxy>
         <hashTree/>
