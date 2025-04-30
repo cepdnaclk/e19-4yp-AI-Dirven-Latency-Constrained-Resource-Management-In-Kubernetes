@@ -1,32 +1,15 @@
-# Use the official Golang image to build the app
-FROM golang:1.24 as builder
-
-# Set the working directory
+# Build Stage
+FROM golang AS builder
 WORKDIR /app
 
-# Copy the Go module files (optional if you use Go modules)
-COPY go.mod ./
+COPY go.mod .
+COPY main.go .
 
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app
 
-
-
-# Copy the entire project
-COPY . .
-
-# Build the Go app
-RUN go build -o main .
-
-# Use a minimal image to run the app
+# Run Stage
 FROM alpine:latest
+COPY --from=builder /app/app /app
 
-# Set the working directory
-WORKDIR /root/
-
-# Copy the binary from the builder
-COPY --from=builder /app/main .
-
-# Expose the port the app runs on
-EXPOSE 8080
-
-# Command to run the binary
-CMD ["./main"]
+EXPOSE 3002
+ENTRYPOINT ["/app"]
