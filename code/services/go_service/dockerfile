@@ -19,23 +19,22 @@
 FROM golang:latest AS builder
 WORKDIR /app
 
-# Download dependencies
+# Copy Go mod and sum files
 COPY go.mod go.sum ./
+
+# Download dependencies
 RUN go mod download
 
 # Copy the source code
 COPY main.go .
 
-# Build a statically linked binary
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o app .
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app .
 
-# Final Stage
+# Run Stage
 FROM alpine:latest
 WORKDIR /root/
-
-# Copy binary from builder
 COPY --from=builder /app/app .
 
-EXPOSE 3002
 CMD ["./app"]
 
