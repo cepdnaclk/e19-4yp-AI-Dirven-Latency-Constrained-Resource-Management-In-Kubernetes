@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auto-updater
+  labels:
+    app: auto-updater
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auto-updater
+  template:
+    metadata:
+      labels:
+        app: auto-updater
+    spec:
+      containers:
+      - name: auto-updater
+        image: wishula/auto-updater:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "250m"
+            memory: "256Mi"
+        env:
+        - name: PROMETHEUS_URL
+          value: "http://192.248.41.95:9090"
+        volumeMounts:
+        - name: cooldown-volume
+          mountPath: /app/cooldown_state.json
+          subPath: cooldown_state.json
+      volumes:
+      - name: cooldown-volume
+        configMap:
+          name: cooldown-configmap
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cooldown-configmap
+data:
+  cooldown_state.json: |
+    {}
