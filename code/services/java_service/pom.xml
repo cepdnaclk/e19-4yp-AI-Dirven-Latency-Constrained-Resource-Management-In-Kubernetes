@@ -51,12 +51,23 @@
         <artifactId>jackson-databind</artifactId>
     </dependency>
 
-    <!-- Spring Boot Starter Test (only if you want to write unit tests) -->
-    <dependency>
+	<dependency>
+    <groupId>io.micrometer</groupId>
+    <artifactId>micrometer-registry-prometheus</artifactId>
+	</dependency>
+	
+	<dependency>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-test</artifactId>
-        <scope>test</scope>
+        <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
+	<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>javax.servlet-api</artifactId>
+    <version>4.0.1</version>
+    <scope>provided</scope>
+</dependency>
+
+
 	</dependencies>
 
 	<build>

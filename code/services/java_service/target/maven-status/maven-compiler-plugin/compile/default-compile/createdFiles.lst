@@ -1,3 +1,4 @@
 com\example\demo\DemoApplication.class
+com\example\demo\MetricsRedirectController.class
 com\example\demo\PrimeController.class
 com\example\demo\PrimeController$PrimeResponse.class
