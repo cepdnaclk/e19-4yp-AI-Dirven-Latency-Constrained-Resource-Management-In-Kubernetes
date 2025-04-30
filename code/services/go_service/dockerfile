@@ -1,15 +1,41 @@
+# # Build Stage
+# FROM golang AS builder
+# WORKDIR /app
+
+# COPY go.mod .
+# COPY main.go .
+
+# RUN go build -o app
+
+# # Run Stage
+# FROM alpine:latest
+# COPY --from=builder /app/app /app
+
+# EXPOSE 3002
+# ENTRYPOINT ["/app"]
+
+
 # Build Stage
-FROM golang AS builder
+FROM golang:latest AS builder
 WORKDIR /app
 
-COPY go.mod .
+# Download dependencies
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy the source code
 COPY main.go .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app
+# Build a statically linked binary
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o app .
 
-# Run Stage
+# Final Stage
 FROM alpine:latest
-COPY --from=builder /app/app /app
+WORKDIR /root/
+
+# Copy binary from builder
+COPY --from=builder /app/app .
 
 EXPOSE 3002
-ENTRYPOINT ["/app"]
+CMD ["./app"]
+
