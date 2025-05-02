@@ -1,15 +1,22 @@
 # Build Stage
-FROM golang AS builder
+FROM golang:latest AS builder
 WORKDIR /app
 
-COPY go.mod .
+# Copy Go mod and sum files
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy the source code
 COPY main.go .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app
-
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app .
 # Run Stage
 FROM alpine:latest
-COPY --from=builder /app/app /app
+WORKDIR /root/
+COPY --from=builder /app/app .
 
-EXPOSE 3002
-ENTRYPOINT ["/app"]
+CMD ["./app"]
+
