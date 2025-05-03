@@ -9,7 +9,7 @@ title: AI Dirven Latency Constrained Resource Management In Kubernetes
 
 [comment]: # "This is the standard layout for the project, but you can clean this and use your own template"
 
-# Dynamic AI Dirven Latency Constrained Resource Management In Kubernetes
+# AI Dirven Latency Constrained Resource Management In Kubernetes
 
 #### Team
 
