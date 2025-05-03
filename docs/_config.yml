@@ -1,9 +1,9 @@
 # This theme is based on https://github.com/jekyll/minima
 # Please refer above link to know the available configurations
 
-title: "Dynamic Multi Dimensional Resource Orchestration in Kubernetes"
-remote_theme: cepdnaclk/e19-Dynamic-Multi-Dimensional-Resource-Orchestration-in-Kubernetes
-description: "focuses on latency-aware resource optimization for Kubernetes"
+title: "AI Dirven Latency Constrained Resource Management In Kubernetes"
+remote_theme: cepdnaclk/e19-4yp-AI-Dirven-Latency-Constrained-Resource-Management-In-Kubernetes
+description: "Focuses on latency-aware resource optimization for Kubernetes"
 markdown: kramdown
 
 kramdown:
