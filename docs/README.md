@@ -3,13 +3,13 @@ layout: home
 permalink: index.html
 
 # Please update this with your repository name and title
-repository-name: e19-4yp-Dynamic-Multi-Dimensional-Resource-Orchestration-in-Kubernetes
-title: Dynamic Multi Dimensional Resource Orchestration in Kubernetes
+repository-name: e19-4yp-AI-Dirven-Latency-Constrained-Resource-Management-In-Kubernetes
+title: AI Dirven Latency Constrained Resource Management In Kubernetes
 ---
 
 [comment]: # "This is the standard layout for the project, but you can clean this and use your own template"
 
-# Dynamic Multi Dimensional Resource Orchestration in Kubernetes
+# Dynamic AI Dirven Latency Constrained Resource Management In Kubernetes
 
 #### Team
 
@@ -69,7 +69,7 @@ This is a sample image, to show how to add images to your page. To learn more op
 
 [//]: # ( NOTE: EDIT THIS LINKS WITH YOUR REPO DETAILS )
 
-- [Project Repository](https://github.com/cepdnaclk/e19-4yp-Dynamic-Multi-Dimensional-Resource-Orchestration-in-Kubernetes)
+- [Project Repository](https://github.com/cepdnaclk/e19-4yp-AI-Dirven-Latency-Constrained-Resource-Management-In-Kubernetes)
 - [Project Page](https://cepdnaclk.github.io/e19-4yp-Dynamic-Multi-Dimensional-Resource-Orchestration-in-Kubernetes)
 - [Department of Computer Engineering](http://www.ce.pdn.ac.lk/)
 - [University of Peradeniya](https://eng.pdn.ac.lk/)
