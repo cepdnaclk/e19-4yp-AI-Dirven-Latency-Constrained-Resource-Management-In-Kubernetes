@@ -28,13 +28,18 @@ def run_jmx_test(jmx_path):
     client_name = os.path.normpath(jmx_path).split(os.sep)[0].replace("_", "")
     service_name = "service1" if "service-1" in jmx_filename else "service2"
 
-    # Create single log file per client-service
-    os.makedirs(LOGS_DIR, exist_ok=True)
-    log_filename = f"{client_name}_{service_name}.log"
-    log_path = os.path.join(LOGS_DIR, log_filename)
+    while True:
+        # Create a unique timestamped report directory
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        report_dir = os.path.join("generated_reports", f"{client_name}_{service_name}_report_{timestamp}")
+        os.makedirs(report_dir, exist_ok=True)
 
-    while True:  # Keep running the test continuously
-        # Write session header
+        results_path = os.path.join(report_dir, f"{jmx_filename}_results.csv")
+
+        # Create log file for this run
+        os.makedirs("logs", exist_ok=True)
+        log_path = os.path.join("logs", f"{client_name}_{service_name}.log")
+
         session_header = f"\n{'=' * 10} NEW SESSION [{datetime.now()}] {jmx_filename} {'=' * 10}\n"
 
         with open(log_path, "a") as log_file:
@@ -43,17 +48,25 @@ def run_jmx_test(jmx_path):
 
             print(f"[{datetime.now()}] Running: {jmx_path}")
             process = subprocess.Popen(
-                [JMETER_PATH, "-n", "-t", jmx_abs_path],
+                [
+                    JMETER_PATH, "-n",
+                    "-t", jmx_abs_path,
+                    "-l", results_path,
+                    "-e", "-o", report_dir
+                ],
                 stdout=log_file,
                 stderr=log_file,
                 cwd=jmx_dir
             )
             process.wait()
+
             log_file.write(f"[{datetime.now()}] Finished with exit code {process.returncode}\n")
             log_file.flush()
 
-            # Wait a short time before starting the test again
-            time.sleep(5)  # Adjust the delay if necessary
+            print(f"Test completed. Results saved to {results_path} and HTML report generated in {report_dir}/")
+
+        time.sleep(5)
+
 
 
 def main():
