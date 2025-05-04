@@ -31,7 +31,10 @@ def run_jmx_test(jmx_path):
     while True:
         # Create a unique timestamped report directory
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        report_dir = os.path.join("generated_reports", f"{client_name}_{service_name}_report_{timestamp}")
+        base_report_dir = os.path.abspath("generated_reports")
+        os.makedirs(base_report_dir, exist_ok=True)
+
+        report_dir = os.path.join(base_report_dir, f"{client_name}_{service_name}_report_{timestamp}")
         os.makedirs(report_dir, exist_ok=True)
 
         results_path = os.path.join(report_dir, f"{jmx_filename}_results.csv")
