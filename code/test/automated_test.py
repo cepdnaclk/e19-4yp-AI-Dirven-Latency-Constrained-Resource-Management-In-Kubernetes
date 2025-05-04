@@ -1,93 +1,73 @@
-import subprocess
-import time
 import os
+import subprocess
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta
+from datetime import datetime
+import time
 
-SCRIPT_DURATION = 3630
+JMETER_PATH = "jmeter"  # Update if jmeter is not in PATH
 LOGS_DIR = "logs"
+CLIENT_DIRS = ["client_1", "client_2"]
 
 
-def find_files(root_dirs=["client_1", "client_2"], file_extension=".sh"):
-    files = []
-    for root_dir in root_dirs:
-        for dirpath, _, filenames in os.walk(root_dir):
-            for file in filenames:
-                if file.endswith(file_extension):
-                    files.append(os.path.join(dirpath, file))
-    return files
+def find_jmx_files():
+    jmx_files = []
+    for client_dir in CLIENT_DIRS:
+        for root, _, files in os.walk(client_dir):
+            for file in files:
+                if file.endswith(".jmx"):
+                    jmx_files.append(os.path.join(root, file))
+    return jmx_files
 
 
-def get_log_file_path(script_path):
-    rel_path = os.path.relpath(script_path, ".").replace("/", "_")
-    log_filename = f"{rel_path}.log"
-    return os.path.join(LOGS_DIR, log_filename)
+def run_jmx_test(jmx_path):
+    jmx_abs_path = os.path.abspath(jmx_path)
+    jmx_dir = os.path.dirname(jmx_abs_path)
+    jmx_filename = os.path.basename(jmx_path).replace(".jmx", "")
 
+    # Extract client and service names
+    client_name = os.path.normpath(jmx_path).split(os.sep)[0].replace("_", "")
+    service_name = "service1" if "service-1" in jmx_filename else "service2"
 
-def get_jmx_files(root_dirs=["client_1", "client_2"]):
-    return find_files(root_dirs, ".jmx")
-
-
-def run_script_continuously(script_path, duration, jmx_file):
+    # Create single log file per client-service
     os.makedirs(LOGS_DIR, exist_ok=True)
-    log_file_path = get_log_file_path(script_path)
+    log_filename = f"{client_name}_{service_name}.log"
+    log_path = os.path.join(LOGS_DIR, log_filename)
 
-    script_dir = os.path.dirname(script_path)
+    while True:  # Keep running the test continuously
+        # Write session header
+        session_header = f"\n{'=' * 10} NEW SESSION [{datetime.now()}] {jmx_filename} {'=' * 10}\n"
 
-    # Print the full path of the script for debugging
-    print(f"Attempting to run script: {os.path.abspath(script_path)}")
-
-    end_time = datetime.now() + timedelta(seconds=duration)
-    with open(log_file_path, "a") as log_file:
-        session_header = f"\n{'=' * 20} NEW SESSION [{datetime.now()}] {script_path} {'=' * 20}\n"
-        log_file.write(session_header)
-        log_file.flush()
-
-        while datetime.now() < end_time:
-            log_file.write(f"[{datetime.now()}] Starting {script_path} with JMX {jmx_file}\n")
+        with open(log_path, "a") as log_file:
+            log_file.write(session_header)
             log_file.flush()
 
-            # Change working directory to where the script is located
+            print(f"[{datetime.now()}] Running: {jmx_path}")
             process = subprocess.Popen(
-                ["bash", script_path],
+                [JMETER_PATH, "-n", "-t", jmx_abs_path],
                 stdout=log_file,
                 stderr=log_file,
-                cwd=os.path.abspath(script_path)  # Set the working directory to the directory of the script
+                cwd=jmx_dir
             )
-            while process.poll() is None and datetime.now() < end_time:
-                time.sleep(5)
-
-            log_file.write(f"[{datetime.now()}] Script ended or killed\n")
+            process.wait()
+            log_file.write(f"[{datetime.now()}] Finished with exit code {process.returncode}\n")
             log_file.flush()
-            if datetime.now() < end_time:
-                log_file.write(f"[{datetime.now()}] Restarting {script_path}\n")
-                log_file.flush()
 
+            # Wait a short time before starting the test again
+            time.sleep(5)  # Adjust the delay if necessary
 
 
 def main():
-    print("Starting script execution...")
-    print("Current working directory:", os.getcwd())  # <-- Add this
-
-    sh_files = find_files(file_extension=".sh")
-    jmx_files = get_jmx_files()
-
-    if not sh_files:
-        print("No .sh files found.")
-        return
+    jmx_files = find_jmx_files()
 
     if not jmx_files:
-        print("No .jmx files found.")
+        print("No JMX files found.")
         return
 
-    print(f"Found {len(sh_files)} .sh files.")
-    print(f"Found {len(jmx_files)} .jmx files.")
+    print(f"Found {len(jmx_files)} JMX files. Executing in parallel...")
 
-    with ThreadPoolExecutor(max_workers=len(sh_files)) as executor:
-        for script in sh_files:
-            jmx_file = jmx_files[0]
-            executor.submit(run_script_continuously, script, SCRIPT_DURATION, jmx_file)
-
+    with ThreadPoolExecutor(max_workers=len(jmx_files)) as executor:
+        for jmx_file in jmx_files:
+            executor.submit(run_jmx_test, jmx_file)
 
 
 if __name__ == "__main__":

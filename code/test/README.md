@@ -72,13 +72,3 @@ Or monitor log output using:
 ```bash
 tail -f logs/client_1_run-service-1-test.sh.log
 ```
-
-## ⚙️ Customization
-
-- Test duration is currently set to **1 hour** per script. You can change it in `automated_test.py`:
-
-```python
-SCRIPT_DURATION = 3600  # seconds
-```
-
-- Logs are appended, not overwritten, to preserve history.
