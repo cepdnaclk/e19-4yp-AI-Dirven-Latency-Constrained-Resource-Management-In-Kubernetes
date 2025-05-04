@@ -32,9 +32,10 @@ def run_script_continuously(script_path, duration, jmx_file):
     os.makedirs(LOGS_DIR, exist_ok=True)
     log_file_path = get_log_file_path(script_path)
 
-    # Ensure the directory of the script is the current working directory
     script_dir = os.path.dirname(script_path)
-    # print(script_dir)
+
+    # Print the full path of the script for debugging
+    print(f"Attempting to run script: {os.path.abspath(script_path)}")
 
     end_time = datetime.now() + timedelta(seconds=duration)
     with open(log_file_path, "a") as log_file:
@@ -51,7 +52,7 @@ def run_script_continuously(script_path, duration, jmx_file):
                 ["bash", script_path],
                 stdout=log_file,
                 stderr=log_file,
-                cwd=script_dir  # Set the working directory to the directory of the script
+                cwd=os.path.abspath(script_path)  # Set the working directory to the directory of the script
             )
             while process.poll() is None and datetime.now() < end_time:
                 time.sleep(5)
@@ -63,7 +64,11 @@ def run_script_continuously(script_path, duration, jmx_file):
                 log_file.flush()
 
 
+
 def main():
+    print("Starting script execution...")
+    print("Current working directory:", os.getcwd())  # <-- Add this
+
     sh_files = find_files(file_extension=".sh")
     jmx_files = get_jmx_files()
 
@@ -75,15 +80,14 @@ def main():
         print("No .jmx files found.")
         return
 
-    # print(f"Found {len(sh_files)} .sh files.")
-    # print(f"Found {len(jmx_files)} .jmx files.")
+    print(f"Found {len(sh_files)} .sh files.")
+    print(f"Found {len(jmx_files)} .jmx files.")
 
-    # You can now pair the corresponding shell scripts and JMX files here
     with ThreadPoolExecutor(max_workers=len(sh_files)) as executor:
         for script in sh_files:
-            # For now, just take the first JMX file for each script
             jmx_file = jmx_files[0]
             executor.submit(run_script_continuously, script, SCRIPT_DURATION, jmx_file)
+
 
 
 if __name__ == "__main__":

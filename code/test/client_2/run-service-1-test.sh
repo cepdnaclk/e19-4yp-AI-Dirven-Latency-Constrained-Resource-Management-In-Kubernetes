@@ -12,7 +12,7 @@ REPORT_DIR="$REPORTS_DIR/report_$TIMESTAMP"
 mkdir -p "$REPORT_DIR"
 
 # Run the JMeter test in non-GUI mode
-jmeter -n -t client_2/service-1-test.jmx -l "$REPORT_DIR/results1.csv" -e -o "$REPORT_DIR"
+jmeter -n -t service-1-test.jmx -l "$REPORT_DIR/results1.csv" -e -o "$REPORT_DIR"
 
 # Print a message when the test is completed
 echo "Test completed. Results saved to $REPORT_DIR/results1.csv and HTML report generated in $REPORT_DIR/"
