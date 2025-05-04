@@ -7,12 +7,13 @@ from datetime import datetime, timedelta
 SCRIPT_DURATION = 3630
 LOGS_DIR = "logs"
 
-def find_shell_scripts(root_dir="."):
+def find_shell_scripts(root_dirs=["client_1", "client_2"]):
     sh_files = []
-    for dirpath, _, filenames in os.walk(root_dir):
-        for file in filenames:
-            if file.endswith(".sh"):
-                sh_files.append(os.path.join(dirpath, file))
+    for root_dir in root_dirs:
+        for dirpath, _, filenames in os.walk(root_dir):
+            for file in filenames:
+                if file.endswith(".sh"):
+                    sh_files.append(os.path.join(dirpath, file))
     return sh_files
 
 def get_log_file_path(script_path):
@@ -53,6 +54,8 @@ def main():
         print("No .sh files found.")
         return
 
+    # print(f"Found {len(sh_files)} .sh files.")
+    # print(sh_files)
     with ThreadPoolExecutor(max_workers=len(sh_files)) as executor:
         for script in sh_files:
             executor.submit(run_script_continuously, script, SCRIPT_DURATION)
