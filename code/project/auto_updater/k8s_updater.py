@@ -5,7 +5,7 @@ from kubernetes import client, config
 from auto_updater.config import SERVICES
 
 # Load kube config
-config.load_kube_config()
+config.load_incluster_config()
 
 apps_v1 = client.AppsV1Api()
 
