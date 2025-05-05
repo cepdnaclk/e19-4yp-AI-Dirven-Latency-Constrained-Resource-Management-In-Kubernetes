@@ -2,7 +2,7 @@ from auto_updater.prometheus_client import query_prometheus, get_cpu_query, get_
 from auto_updater.analyzer import analyze_cpu, analyze_memory
 from auto_updater.k8s_updater import update_resources
 from auto_updater.config import SERVICES, CPU_THRESHOLD, MEMORY_THRESHOLD, MAX_MEMORY_LIMIT
-from auto_updater.resource_analyzer import (
+from auto_updater.analyzer import (
     get_combined_resource_updates,
     reduce_resources_periodically,
     stop_resource_reduction,
