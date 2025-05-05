@@ -1,5 +1,5 @@
 from auto_updater.prometheus_client import query_prometheus, get_cpu_query, get_memory_query
-from auto_updater.analyzer import analyze_cpu_usage, analyze_memory_usage
+from auto_updater.analyzer import analyze_cpu, analyze_memory
 from auto_updater.k8s_updater import update_resources
 from auto_updater.config import SERVICES, CPU_THRESHOLD, MEMORY_THRESHOLD, MAX_MEMORY_LIMIT
 from auto_updater.resource_analyzer import (
