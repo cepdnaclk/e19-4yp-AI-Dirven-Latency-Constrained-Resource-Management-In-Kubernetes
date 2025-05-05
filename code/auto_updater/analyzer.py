@@ -1,4 +1,4 @@
-ates = {}
+combined_updates = {}
     
     for container, cpu in cpu_updates:
         if container not in combined_updates:
