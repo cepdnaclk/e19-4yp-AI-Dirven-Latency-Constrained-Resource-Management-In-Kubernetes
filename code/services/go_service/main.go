@@ -10,23 +10,22 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-type PrimeResponse struct {
-	Number int  `json:"number"`
-	Prime  bool `json:"prime"`
+type EchoResponse struct {
+	Message string `json:"message"`
 }
 
 // Prometheus metrics
 var (
 	requestsTotal = prometheus.NewCounter(
 		prometheus.CounterOpts{
-			Name: "prime_checker_requests_total",
-			Help: "Total number of /isPrime requests",
+			Name: "echo_number_requests_total",
+			Help: "Total number of /echoNumber requests",
 		},
 	)
 	requestDuration = prometheus.NewHistogram(
 		prometheus.HistogramOpts{
-			Name:    "prime_checker_request_duration_seconds",
-			Help:    "Duration of /isPrime handler in seconds",
+			Name:    "echo_number_request_duration_seconds",
+			Help:    "Duration of /echoNumber handler in seconds",
 			Buckets: prometheus.DefBuckets,
 		},
 	)
@@ -38,16 +37,12 @@ func init() {
 }
 
 func main() {
-	http.HandleFunc("/isPrime", isPrimeHandler)
-
-	// Prometheus endpoint for metrics
+	http.HandleFunc("/echoNumber", echoNumberHandler)
 	http.Handle("/metrics", promhttp.Handler())
-
-	// Start server on port 3002
 	http.ListenAndServe(":3002", nil)
 }
 
-func isPrimeHandler(w http.ResponseWriter, r *http.Request) {
+func echoNumberHandler(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	requestsTotal.Inc()
 
@@ -58,11 +53,8 @@ func isPrimeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := isPrimeRecursive(number, 2)
-
-	response := PrimeResponse{
-		Number: number,
-		Prime:  result,
+	response := EchoResponse{
+		Message: "your number is " + strconv.Itoa(number),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -70,17 +62,4 @@ func isPrimeHandler(w http.ResponseWriter, r *http.Request) {
 
 	duration := time.Since(start).Seconds()
 	requestDuration.Observe(duration)
-}
-
-func isPrimeRecursive(number int, divisor int) bool {
-	if number <= 1 {
-		return false
-	}
-	if divisor*divisor > number {
-		return true
-	}
-	if number%divisor == 0 {
-		return false
-	}
-	return isPrimeRecursive(number, divisor+1)
 }
