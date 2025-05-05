@@ -15,4 +15,4 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Run the auto updater
-CMD ["python", "-m", "auto_updater.main"]
+CMD ["python", "-m", "main.py"]
