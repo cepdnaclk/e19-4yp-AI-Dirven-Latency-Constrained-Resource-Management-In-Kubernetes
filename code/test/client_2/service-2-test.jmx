@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.5">
   <hashTree>
-    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Service-2 Prime Check" enabled="true">
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Service-2 Echo Number" enabled="true">
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments">
         <collectionProp name="Arguments.arguments">
           <elementProp name="BASE_URL" elementType="Argument">
@@ -31,7 +31,7 @@
         <longProp name="ThreadGroup.delay">0</longProp>
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Check Prime" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Echo Number" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments"/>
           </elementProp>
@@ -50,7 +50,7 @@
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.domain">192.168.49.100</stringProp>
           <stringProp name="HTTPSampler.port">3002</stringProp>
-          <stringProp name="HTTPSampler.path">/isPrime?number=29</stringProp>
+          <stringProp name="HTTPSampler.path">/echoNumber?number=20</stringProp>
         </HTTPSamplerProxy>
         <hashTree/>
       </hashTree>
