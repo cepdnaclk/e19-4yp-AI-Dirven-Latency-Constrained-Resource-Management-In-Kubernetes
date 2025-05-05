@@ -73,7 +73,7 @@ def main():
     logger.info("Starting auto updater service")
     
     # Start the periodic resource reduction thread
-    reduction_thread = reduce_resources_periodically(interval=10)
+    reduction_thread = reduce_resources_periodically(container, interval=10)
     logger.info("Resource reduction thread started")
     
     try:
