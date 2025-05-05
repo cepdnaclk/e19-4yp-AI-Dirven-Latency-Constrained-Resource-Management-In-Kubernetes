@@ -7,8 +7,8 @@ def query_prometheus(query):
     results = response.json()["data"]["result"]
     return results
 
-def get_cpu_query(container_name):
-    return f'rate(container_cpu_usage_seconds_total{{container="{container_name}"}}[1h])'
+def get_cpu_query(pod_name):
+    return f'rate(container_cpu_usage_seconds_total{{pod="{pod_name}"}}[1h])'
 
-def get_memory_query(container):
-    return f'container_memory_usage_bytes{{container="{container_name}"}}'
+def get_memory_query(pod_name):
+    return f'container_memory_usage_bytes{{container="{pod_name}"}}'

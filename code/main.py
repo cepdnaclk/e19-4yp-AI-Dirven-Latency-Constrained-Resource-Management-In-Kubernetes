@@ -1,5 +1,5 @@
 from auto_updater.prometheus_client import query_prometheus, get_cpu_query, get_memory_query
-from auto_updater.analyzer import analyze_cpu_usage, analyze_memory_usage
+from auto_updater.analyzer import analyze_cpu, analyze_memory
 from auto_updater.k8s_updater import update_resources
 from auto_updater.config import SERVICES, CPU_THRESHOLD, MEMORY_THRESHOLD, MAX_MEMORY_LIMIT
 from auto_updater.resource_analyzer import (
@@ -79,22 +79,23 @@ def main():
     try:
         while running:
             for svc in SERVICES:
+                pod = svc["pod"]
                 container = svc["container"]
                 deployment = svc["name"]
                 namespace = svc["namespace"]
                 
-                logger.info(f"Checking resources for {container}")
+                logger.info(f"Checking resources for {pod}")
                 
                 # Get CPU metrics
-                cpu_metrics = query_prometheus(get_cpu_query(container))
+                cpu_metrics = query_prometheus(get_cpu_query(pod))
                 if not cpu_metrics:
-                    logger.warning(f"No CPU metrics found for {container}")
+                    logger.warning(f"No CPU metrics found for {pod}")
                     continue
                 
                 # Get memory metrics
-                mem_metrics = query_prometheus(get_memory_query(container))
+                mem_metrics = query_prometheus(get_memory_query(pod))
                 if not mem_metrics:
-                    logger.warning(f"No memory metrics found for {container}")
+                    logger.warning(f"No memory metrics found for {pod}")
                     continue
                 
                 # Calculate current usage percentages
