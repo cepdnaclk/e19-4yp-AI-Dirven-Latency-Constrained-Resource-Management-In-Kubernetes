@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted  # Use the self-hosted runner
 
     steps:
     - name: Checkout Code
@@ -16,35 +16,26 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v3
       with:
-        java-version: '17'  # Change to match your Java app's requirement
+        java-version: '17'
         distribution: 'temurin'
 
     - name: Build Java Service
       run: |
         cd java-service
-        ./gradlew build   # or 'mvn clean install' depending on your project
+        ./gradlew build  # or 'mvn clean install' depending on your project
 
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.20'  # Adjust to match your Go app's version
+        go-version: '1.20'
 
     - name: Build Go Service
       run: |
         cd go-service
         go build -o app
 
-    - name: Setup SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-
     - name: Deploy to Server
       run: |
-        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          cd /var/www/myapp
-          git pull origin main
-          ./restart.sh  # Custom script to restart your services
-        EOF
+        cd /var/www/myapp
+        git pull origin main
+        ./restart.sh  # Custom script to restart your services
