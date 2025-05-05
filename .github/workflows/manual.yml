@@ -15,7 +15,7 @@ jobs:
 
     - name: Deploy to Server
       run: |
-        cd e19-4yp-AI-Dirven-Latency-Constrained-Resource-Management-In-Kubernetes/code/services/
+        cd /home/littleboy/e19-4yp-AI-Dirven-Latency-Constrained-Resource-Management-In-Kubernetes/code/services/
 
         # Fetch the latest commits without merging
         git fetch origin main
