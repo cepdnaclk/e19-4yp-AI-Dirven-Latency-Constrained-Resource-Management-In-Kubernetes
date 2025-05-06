@@ -1,4 +1,3 @@
-# prometheus_client.py
 import requests
 import logging
 
