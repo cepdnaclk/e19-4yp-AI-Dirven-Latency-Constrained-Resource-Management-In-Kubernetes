@@ -2,7 +2,7 @@ SERVICES = [
     {
         "name": "service-1-deployment",
         "container": "service-1-container",
-        "pod"
+        "pod": ""
         "namespace": "default"
     },
     {
