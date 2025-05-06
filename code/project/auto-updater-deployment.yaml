@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: auto-updater
-          image: wishula/auto-updater1:latest
+          image: wishula/auto-updater2:latest
           imagePullPolicy: Always
       restartPolicy: Always
