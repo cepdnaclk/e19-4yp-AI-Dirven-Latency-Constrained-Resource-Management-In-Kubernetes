@@ -24,7 +24,7 @@ spec:
           image: rand-pw-gen-image:latest
           imagePullPolicy: Never
           ports:
-            - containerPort: 3001
+            - containerPort: 3003
           resources:
             requests:
               cpu: "100m"
