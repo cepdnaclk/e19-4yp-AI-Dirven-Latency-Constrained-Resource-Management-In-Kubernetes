@@ -55,7 +55,7 @@ def main():
     logger.info("Starting auto updater service")
 
     container_names = [svc["container"] for svc in SERVICES]
-    reduction_thread = reduce_resources_periodically(container_names, interval=10)
+    reduction_thread = reduce_resources_periodically(interval=10)
     logger.info("Resource reduction thread started")
 
     try:
