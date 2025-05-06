@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: base64-deployment
+  namespace: default
+  labels:
+    app: base64
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: base64
+  template:
+    metadata:
+      labels:
+        app: base64
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "3004"
+    spec:
+      containers:
+        - name: base64-container
+          image: base64-image:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3004
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: base64-service
+  namespace: default
+  labels:
+    app: base64
+spec:
+  selector:
+    app: base64
+  ports:
+    - protocol: TCP
+      port: 3004
+      targetPort: 3004
+  type: LoadBalancer
