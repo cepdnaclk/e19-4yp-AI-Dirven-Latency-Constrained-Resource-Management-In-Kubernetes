@@ -73,13 +73,15 @@ def main():
     logger.info("Starting auto updater service")
     
     # Start the periodic resource reduction thread
-    reduction_thread = reduce_resources_periodically(container, interval=10)
+    reduction_thread = threading.Thread(target=reduce_resources_periodically, args=(10,))
+    reduction_thread.start()
     logger.info("Resource reduction thread started")
     
     try:
         while running:
             for svc in SERVICES:
                 container = svc["container"]
+                pod = svc["pod"]
                 deployment = svc["name"]
                 namespace = svc["namespace"]
                 
