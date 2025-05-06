@@ -13,7 +13,7 @@ def query_prometheus(query):
         logger.error(f"Failed to query Prometheus: {e}")
         return []
 
-def get_cpu_query(pod):
+def get_cpu_query(pod, duration="1h"):
     return f'rate(container_cpu_usage_seconds_total{{pod="{pod}"}}[1h]) * 100'
 
 def get_memory_query(pod):
