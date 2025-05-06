@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ip-geo-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ip-geo
+  template:
+    metadata:
+      labels:
+        app: ip-geo
+    spec:
+      containers:
+      - name: geo
+        image: your-dockerhub/ip-geo-service:latest
+        ports:
+        - containerPort: 8000
+        - containerPort: 8001  # Prometheus metrics
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
