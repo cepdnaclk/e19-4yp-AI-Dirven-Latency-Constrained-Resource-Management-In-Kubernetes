@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auto-updater
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auto-updater
+  template:
+    metadata:
+      labels:
+        app: auto-updater
+    spec:
+      containers:
+        - name: auto-updater
+          image: wishula/auto-updater1:latest
+          imagePullPolicy: Always
+      restartPolicy: Always
