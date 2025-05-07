@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+textblob
+prometheus_client
+psutil
