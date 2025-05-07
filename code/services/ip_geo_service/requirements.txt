@@ -1,4 +1,4 @@
 fastapi
 uvicorn
 prometheus-client
-ip2location
+ip2location==8.10.5

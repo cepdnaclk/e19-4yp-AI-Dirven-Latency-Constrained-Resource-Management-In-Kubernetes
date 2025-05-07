@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hash-gen-deployment
+  namespace: default
+  labels:
+    app: hash-gen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hash-gen
+  template:
+    metadata:
+      labels:
+        app: hash-gen
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "3005"
+    spec:
+      containers:
+        - name: hash-gen-container
+          image: hash-gen-image:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3005
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hash-gen-service
+  namespace: default
+  labels:
+    app: hash-gen
+spec:
+  selector:
+    app: hash-gen
+  ports:
+    - protocol: TCP
+      port: 3005
+      targetPort: 3005
+  type: LoadBalancer
