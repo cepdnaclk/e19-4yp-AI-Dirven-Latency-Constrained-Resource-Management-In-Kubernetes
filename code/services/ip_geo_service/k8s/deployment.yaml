@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: geo
-        image: your-dockerhub/ip-geo-service:latest
+        image: wishula/ip-geo-service:latest
         ports:
         - containerPort: 8000
         - containerPort: 8001  # Prometheus metrics
