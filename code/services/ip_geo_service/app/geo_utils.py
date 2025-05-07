@@ -1,3 +1,5 @@
+import sys
+print("Using Python from:", sys.executable)
 import ip2location
 
 # Load local DB
