@@ -19,11 +19,11 @@ async def add_metrics_middleware(request: Request, call_next):
 
     return response
 
-@app.get("/geoip")
+@app.get("/geo/{ip}")
 def geoip_lookup(ip: str):
     result = get_geolocation(ip)
     return result
 
 @app.on_event("startup")
 def setup_metrics():
-    start_metrics_server()  # runs Prometheus server on port 8001
+    start_metrics_server()  # runs Prometheus metrics server on port 8001
