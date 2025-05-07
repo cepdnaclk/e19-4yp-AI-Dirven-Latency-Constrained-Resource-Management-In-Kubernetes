@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: sentiment
-        image: <your-dockerhub-username>/sentiment-service:latest
+        image: wishula/sentiment-service:latest
         ports:
         - containerPort: 8000
         - containerPort: 8001
