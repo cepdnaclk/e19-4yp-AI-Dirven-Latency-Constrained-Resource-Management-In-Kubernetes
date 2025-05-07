@@ -1,7 +1,9 @@
-import ip2location
+import sys
+print("Using Python from:", sys.executable)
+import IP2Location
 
 # Load local DB
-db = ip2location.IP2Location("IP2LOCATION-LITE-DB1.BIN")
+db = IP2Location.IP2Location("IP2LOCATION-LITE-DB1.BIN")
 
 def get_geolocation(ip: str):
     try:
