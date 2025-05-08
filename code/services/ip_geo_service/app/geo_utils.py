@@ -1,8 +1,6 @@
-<<<<<<< HEAD
-=======
+
 import sys
 print("Using Python from:", sys.executable)
->>>>>>> 559b5ec3b653abaa04c9216dae5df4a7e8cf14d0
 import IP2Location
 
 # Load local DB
