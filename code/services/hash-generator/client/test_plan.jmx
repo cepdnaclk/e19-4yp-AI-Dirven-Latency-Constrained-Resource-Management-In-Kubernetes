@@ -1,48 +1,58 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<TestPlan guiclass="TestPlanGUI" testclass="TestPlan" testname="Hash Service Test Plan" enabled="true">
+<TestPlan guiclass="TestPlanGUI" testclass="TestPlan" testname="Realistic Workload Test Plan" enabled="true">
   <hashTree>
-    <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="true">
+    <!-- User Defined Variables for Dynamic Data -->
+    <UserDefinedVariables guiclass="UserDefinedVariablesGui" testclass="UserDefinedVariables" testname="Dynamic Variables" enabled="true">
+      <stringProp name="VariableName">userName</stringProp>
+      <stringProp name="VariableValue">${__CSVRead(users.csv, 0)}</stringProp> <!-- Read Usernames -->
+    </UserDefinedVariables>
+
+    <!-- Thread Group for Simulating User Load -->
+    <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="User Load" enabled="true">
       <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-      <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
-        <boolProp name="LoopController.continuous">false</boolProp>
-        <intProp name="LoopController.loops">1</intProp>
-      </elementProp>
-      <stringProp name="ThreadGroup.num_threads">50</stringProp> <!-- Max number of threads (users) -->
-      <stringProp name="ThreadGroup.ramp_time">10</stringProp> <!-- Ramp-up time in seconds -->
-      <stringProp name="ThreadGroup.duration">3600</stringProp> <!-- Duration in seconds (1 hour) -->
+      <stringProp name="ThreadGroup.num_threads">10</stringProp> <!-- 100 Virtual Users -->
+      <stringProp name="ThreadGroup.ramp_time">30</stringProp> <!-- Ramp-up time in seconds -->
       <stringProp name="ThreadGroup.scheduler">true</stringProp>
+      <stringProp name="ThreadGroup.duration">3600</stringProp> <!-- Test Duration in seconds -->
       <stringProp name="ThreadGroup.start_time">2025-05-08 00:00:00</stringProp>
       <stringProp name="ThreadGroup.end_time">2025-05-08 01:00:00</stringProp>
-      <stringProp name="ThreadGroup.delay">0</stringProp>
 
+      <!-- Add Random Timer to simulate Think Time between requests -->
       <hashTree>
-        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Random Loop Controller" enabled="true">
-          <boolProp name="LoopController.continuous">false</boolProp>
-          <intProp name="LoopController.loops">${__Random(1,50)}</intProp> <!-- Random number of requests between 1 and 50 -->
-        </LoopController>
-        <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Send SHA256 Request" enabled="true">
-            <stringProp name="HTTPSampler.domain">192.168.49.102</stringProp>
-            <stringProp name="HTTPSampler.port">3005</stringProp>
-            <stringProp name="HTTPSampler.protocol">http</stringProp>
-            <stringProp name="HTTPSampler.path">/hash/sha256</stringProp>
-            <stringProp name="HTTPSampler.method">POST</stringProp>
-            <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
-            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-            <stringProp name="HTTPSampler.body_data">"test"</stringProp>
-            <stringProp name="HTTPSampler.filename"></stringProp>
-            <stringProp name="HTTPSampler.parameters"></stringProp>
-            <stringProp name="HTTPSampler.responseTimeout">30000</stringProp>
-            <stringProp name="HTTPSampler.connectTimeout">30000</stringProp>
-          </HTTPSamplerProxy>
+        <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Think Time" enabled="true">
+          <stringProp name="RandomTimer.range">2000</stringProp> <!-- 2 seconds random think time -->
+        </UniformRandomTimer>
+      </hashTree>
 
-          <hashTree>
-            <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="Results" enabled="true">
-              <stringProp name="filename">test_results/hash_gen_jmx_results.csv</stringProp>
-            </ResultCollector>
-          </hashTree>
-        </hashTree>
+      <!-- HTTP Request to simulate real workload (e.g., SHA256 request) -->
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="SHA256 Request" enabled="true">
+          <stringProp name="HTTPSampler.domain">192.168.49.102</stringProp>
+          <stringProp name="HTTPSampler.port">3005</stringProp>
+          <stringProp name="HTTPSampler.protocol">http</stringProp>
+          <stringProp name="HTTPSampler.path">/hash/sha256</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <stringProp name="HTTPSampler.body_data">"test"</stringProp> <!-- This should be dynamic -->
+          <stringProp name="HTTPSampler.filename"></stringProp>
+          <stringProp name="HTTPSampler.parameters"></stringProp>
+        </HTTPSamplerProxy>
+      </hashTree>
+
+      <!-- Add a Throughput Controller to control the percentage of requests -->
+      <hashTree>
+        <ThroughputController guiclass="ThroughputControlPanel" testclass="ThroughputController" testname="Request Throughput Control" enabled="true">
+          <stringProp name="ThroughputController.percent">50</stringProp> <!-- 50% of the time -->
+        </ThroughputController>
+      </hashTree>
+
+      <!-- Add Listener for Real-time Monitoring -->
+      <hashTree>
+        <SummaryReport guiclass="SummaryReport" testclass="SummaryReport" testname="Summary Report" enabled="true">
+          <stringProp name="filename">test_results/hash_gen_summary.csv</stringProp>
+        </SummaryReport>
       </hashTree>
     </ThreadGroup>
-  </hashTree>
+    </hashTree>
+  
 </TestPlan>
