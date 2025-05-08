@@ -1,0 +1,38 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted  # Use the self-hosted runner
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Deploy to Server
+      run: |
+        cd /home/littleboy/e19-4yp-AI-Dirven-Latency-Constrained-Resource-Management-In-Kubernetes/code/services/
+
+        # Fetch the latest commits without merging
+        git fetch origin main
+    
+        # Get the list of changed files between current HEAD and origin/main
+        CHANGED=$(git diff --name-only HEAD origin/main)
+    
+        # Show the changed files for debugging
+        echo "Changed files:"
+        echo "$CHANGED"
+    
+        # Check if any files in java-service or go-service have changed
+        if echo "$CHANGED" | grep -qE '^java-service/|^go-service/'; then
+          echo "Detected changes in java-service or go-service"
+          git pull origin main
+          ./restart.sh
+        else
+          echo "No relevant changes found. Skipping restart."
+        fi
+
