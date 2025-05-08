@@ -18,7 +18,7 @@
       <hashTree>
         <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Random Loop Controller" enabled="true">
           <boolProp name="LoopController.continuous">false</boolProp>
-          <intProp name="LoopController.loops">${__Random(0,50)}</intProp> <!-- Random number of requests between 0 and 50 -->
+          <intProp name="LoopController.loops">${__Random(1,50)}</intProp> <!-- Random number of requests between 1 and 50 -->
         </LoopController>
         <hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Send SHA256 Request" enabled="true">
