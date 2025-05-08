@@ -1,4 +1,4 @@
-from locust import HttpUser, task, between, between
+from locust import HttpUser, task, between
 from random import randint
 import time
 
@@ -8,16 +8,29 @@ class HashGeneratorUser(HttpUser):
 
     @task
     def send_sha256_request(self):
-        self.client.post("/hash/sha256", json={"data": "test"})
+        # Adjust the data payload to match the endpoint's expected input
+        self.client.post("/hash/sha256", data="test", headers={"Content-Type": "text/plain"})
 
     def on_start(self):
-        self.client.verify = False
-        self.client.get("/")
+        # Perform any setup or initialization, such as logging in
+        self.client.get("/")  # Optional if necessary
 
-    def run(self):
-        # Continuously adjust user count between 10 and 20 every 30 seconds
-        while True:
-            user_count = randint(10, 20)
-            print(f"Starting test with {user_count} users")
-            self.environment.runner.start(user_count, spawn_rate=5)
-            time.sleep(30)  # Adjust the interval of changing users
+    def on_stop(self):
+        # Perform any cleanup if necessary
+        pass
+
+def run_locust_continuously():
+    """Run Locust continuously with periodic user adjustments."""
+    while True:
+        user_count = randint(10, 20)  # Random user count between 10 and 20
+        print(f"Starting test with {user_count} users")
+
+        # Start Locust in headless mode with the specified user count
+        command = f"locust -f locustfile.py --headless -u {user_count} -r 5 --run-time 30s --host=http://192.168.49.102:3005"
+        os.system(command)  # Execute the command to start the test
+        time.sleep(30)  # Adjust the interval of changing users (30 seconds)
+
+# Start the continuous running function
+if __name__ == "__main__":
+    import os
+    run_locust_continuously()
