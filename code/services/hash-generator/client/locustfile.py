@@ -9,11 +9,7 @@ class HashGeneratorUser(HttpUser):
     @task
     def send_sha256_request(self):
         # Adjust the data payload to match the endpoint's expected input
-        self.client.post("/hash/sha256", data="test", headers={"Content-Type": "text/plain"})
-
-    def on_start(self):
-        # Perform any setup or initialization, such as logging in
-        self.client.get("/")  # Optional if necessary
+        self.client.post("/hash/sha256", data="ABCDEEF123", headers={"Content-Type": "text/plain"})
 
     def on_stop(self):
         # Perform any cleanup if necessary
