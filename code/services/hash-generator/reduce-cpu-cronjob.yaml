@@ -4,7 +4,7 @@ metadata:
   name: reduce-cpu-cronjob
   namespace: default
 spec:
-  schedule: "*/5 * * * *"
+  schedule: "0 */4 * * *"
   successfulJobsHistoryLimit: 6
   failedJobsHistoryLimit: 6
   jobTemplate:
