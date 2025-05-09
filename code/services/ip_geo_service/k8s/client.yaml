@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: geoip-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: geoip-client
+  template:
+    metadata:
+      labels:
+        app: geoip-client
+    spec:
+      containers:
+      - name: geoip-client
+        image: wishula/ip-geo-client1:latest
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
