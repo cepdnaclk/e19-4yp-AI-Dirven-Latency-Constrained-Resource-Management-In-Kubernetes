@@ -4,6 +4,6 @@ metadata:
   namespace: default
   name: deployment-manager
 rules:
-  - apiGroups: [""]
+  - apiGroups: ["apps"] # ← fix here
     resources: ["deployments"]
     verbs: ["get", "patch"]
