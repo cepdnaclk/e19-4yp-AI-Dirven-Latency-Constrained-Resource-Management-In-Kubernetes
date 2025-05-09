@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sentiment-client-config
+data:
+  API_URL: "http://sentiment-service.default.svc.cluster.local:8000/sentiment"
+  TEXT_LIST: |
+    I love it!
+    This is bad
+    I feel okay
+    Neutral feedback
+    Absolutely fantastic!

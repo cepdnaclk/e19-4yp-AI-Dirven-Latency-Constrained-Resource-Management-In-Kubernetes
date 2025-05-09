@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: client
-        image: yourdockerhub/sentiment-client:latest
+        image: wishula/sentiment-client:latest
         resources:
           requests:
             cpu: "50m"
