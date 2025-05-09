@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentiment-client1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sentiment-client1
+  template:
+    metadata:
+      labels:
+        app: sentiment-client1
+    spec:
+      containers:
+      - name: sentiment-client1
+        image: wishula/sentiment-client1:latest
