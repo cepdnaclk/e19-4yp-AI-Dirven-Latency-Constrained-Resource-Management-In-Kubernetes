@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: geoip-client
+  name: geoip-client1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: geoip-client
+      app: geoip-client1
   template:
     metadata:
       labels:
-        app: geoip-client
+        app: geoip-client1
     spec:
       containers:
-      - name: geoip-client
+      - name: geoip-client1
         image: wishula/ip-geo-client1:latest
         resources:
           requests:
