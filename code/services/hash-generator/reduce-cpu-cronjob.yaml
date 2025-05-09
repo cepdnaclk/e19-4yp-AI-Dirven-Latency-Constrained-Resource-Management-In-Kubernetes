@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: reduce-cpu-cronjob
+  namespace: default
+spec:
+  schedule: "0 */5 * * *"
+  successfulJobsHistoryLimit: 6
+  failedJobsHistoryLimit: 6
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: reduce-cpu
+              image: bitnami/kubectl:latest
+              command: ["/bin/bash", "/scripts/reduce_cpu.sh"]
+              volumeMounts:
+                - name: script-volume
+                  mountPath: /scripts
+          restartPolicy: OnFailure
+          serviceAccountName: default
+          volumes:
+            - name: script-volume
+              configMap:
+                name: reduce-cpu-script
+                defaultMode: 0755
