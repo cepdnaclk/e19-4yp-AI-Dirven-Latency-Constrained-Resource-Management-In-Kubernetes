@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reduce-cpu-rp-script
+  namespace: default
+data:
+  reduce_cpu_rp.sh: |
+    #!/bin/bash
+    DEPLOYMENT_NAME="rand-pw-gen-deployment"
+    NAMESPACE="default"
+    CPU_LIMIT=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.limits.cpu}" | sed 's/m//')
+    CPU_REQUEST=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.requests.cpu}" | sed 's/m//')
+    CPU_MIN=120  # Set the minimum allowed CPU limit to 120m
+    CPU_NEW=$((CPU_LIMIT - 20))  # Always reduce by 20m
+    if [ "$CPU_NEW" -lt "$CPU_MIN" ]; then
+      CPU_NEW=$CPU_MIN  # Prevent reducing CPU below 120m
+    fi
+    echo "Reducing CPU limit: $CPU_LIMIT → $CPU_NEW (minimum allowed: $CPU_MIN)"
+    kubectl patch deployment $DEPLOYMENT_NAME -n $NAMESPACE --type='json' -p="[
+      {\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/resources/limits/cpu\", \"value\": \"${CPU_NEW}m\"}
+    ]"
