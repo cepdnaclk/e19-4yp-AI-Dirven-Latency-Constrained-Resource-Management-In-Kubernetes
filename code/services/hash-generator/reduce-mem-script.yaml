@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reduce-mem-script
+  namespace: default
+data:
+  reduce_mem.sh: |
+    #!/bin/bash
+    DEPLOYMENT_NAME="hash-gen-deployment"
+    NAMESPACE="default"
+    MEM_LIMIT=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.limits.memory}" | sed 's/Mi//')
+    MEM_REQUEST=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.requests.memory}" | sed 's/Mi//')
+    MEM_MIN=156  # Set the minimum allowed memory limit to 156Mi
+    MEM_NEW=$((MEM_LIMIT - 25))  # Always reduce by 25Mi
+    if [ "$MEM_NEW" -lt "$MEM_MIN" ]; then
+      MEM_NEW=$MEM_MIN  # Prevent reducing memory below 156Mi
+    fi
+    echo "Reducing memory limit: $MEM_LIMIT → $MEM_NEW (minimum allowed: $MEM_MIN)"
+    kubectl patch deployment $DEPLOYMENT_NAME -n $NAMESPACE --type='json' -p="[ 
+      {\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/resources/limits/memory\", \"value\": \"${MEM_NEW}Mi\"} 
+    ]"
