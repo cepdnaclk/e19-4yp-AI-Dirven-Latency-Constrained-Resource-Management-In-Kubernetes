@@ -54,29 +54,29 @@ After applying the **roles and permissions**, navigate to the relevant folder fo
 
 ### 1. Apply the CronJob and Script for CPU Limit Reduction
 
-For **reduce-cpu-service**, go to the folder containing `reduce-cpu-service-cronjob.yaml` and `reduce-cpu-service-script.yaml`, and run the following commands:
+For **reduce-cpu-<service>**, go to the folder containing `reduce-cpu-<service>-cronjob.yaml` and `reduce-cpu-<service>-script.yaml`, and run the following commands:
 
 ```bash
-kubectl apply -f reduce-cpu-service-cronjob.yaml
-kubectl apply -f reduce-cpu-service-script.yaml
+kubectl apply -f reduce-cpu-<service>-cronjob.yaml
+kubectl apply -f reduce-cpu-<service>-script.yaml
 ```
 
 ### 2. Apply the CronJob and Script for Memory Limit Reduction
 
-For **reduce-mem-service**, go to the folder containing `reduce-mem-service-cronjob.yaml` and `reduce-mem-service-script.yaml`, and run the following commands:
+For **reduce-mem-<service>**, go to the folder containing `reduce-mem-<service>-cronjob.yaml` and `reduce-mem-<service>-script.yaml`, and run the following commands:
 
 ```bash
-kubectl apply -f reduce-mem-service-cronjob.yaml
-kubectl apply -f reduce-mem-service-script.yaml
+kubectl apply -f reduce-mem-<service>-cronjob.yaml
+kubectl apply -f reduce-mem-<service>-script.yaml
 ```
 
 ### 3. Apply the CronJob and Script for CPU and Memory Reduction
 
-For **reduce-cpu-mem-service**, go to the folder containing `reduce-cpu-mem-service-cronjob.yaml` and `reduce-cpu-mem-service-script.yaml`, and run the following commands:
+For **reduce-cpu-mem-<service>**, go to the folder containing `reduce-cpu-mem-<service>-cronjob.yaml` and `reduce-cpu-mem-<service>-script.yaml`, and run the following commands:
 
 ```bash
-kubectl apply -f reduce-cpu-mem-service-cronjob.yaml
-kubectl apply -f reduce-cpu-mem-service-script.yaml
+kubectl apply -f reduce-cpu-mem-<service>-cronjob.yaml
+kubectl apply -f reduce-cpu-mem-<service>-script.yaml
 ```
 
 ---
@@ -85,9 +85,9 @@ kubectl apply -f reduce-cpu-mem-service-script.yaml
 
 The following **CronJobs** are defined for each service:
 
-1. **reduce-cpu-service-cronjob**: This CronJob reduces the CPU limit of a deployment while keeping the memory limit constant.
-2. **reduce-mem-service-cronjob**: This CronJob reduces the memory limit of a deployment while keeping the CPU limit constant.
-3. **reduce-cpu-mem-service-cronjob**: This CronJob reduces both CPU and memory limits of a deployment.
+1. **reduce-cpu-<service>-cronjob**: This CronJob reduces the CPU limit of a deployment while keeping the memory limit constant.
+2. **reduce-mem-<service>-cronjob**: This CronJob reduces the memory limit of a deployment while keeping the CPU limit constant.
+3. **reduce-cpu-mem-<service>-cronjob**: This CronJob reduces both CPU and memory limits of a deployment.
 
 ---
 
@@ -108,7 +108,7 @@ kubectl logs job/<job-name>
 For example, to check logs for a specific job, use:
 
 ```bash
-kubectl logs job/reduce-cpu-service-job-<timestamp>
+kubectl logs job/reduce-cpu-<service>-job-<timestamp>
 ```
 
 ---
@@ -122,12 +122,12 @@ To remove the CronJobs, scripts, roles, and rolebindings, follow these steps:
 Navigate to the relevant folders and run the following commands to delete the CronJobs and scripts:
 
 ```bash
-kubectl delete -f reduce-cpu-service-cronjob.yaml
-kubectl delete -f reduce-cpu-service-script.yaml
+kubectl delete -f reduce-cpu-<service>-cronjob.yaml
+kubectl delete -f reduce-cpu-<service>-script.yaml
 
-kubectl delete -f reduce-mem-service-cronjob.yaml
-kubectl delete -f reduce-mem-service-script.yaml
+kubectl delete -f reduce-mem-<service>-cronjob.yaml
+kubectl delete -f reduce-mem-<service>-script.yaml
 
-kubectl delete -f reduce-cpu-mem-service-cronjob.yaml
-kubectl delete -f reduce-cpu-mem-service-script.yaml
+kubectl delete -f reduce-cpu-mem-<service>-cronjob.yaml
+kubectl delete -f reduce-cpu-mem-<service>-script.yaml
 ```
