@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: reduce-cpu-cronjob
+  name: reduce-cpu-s2-cronjob
   namespace: default
 spec:
   schedule: "0 */3 * * *"
