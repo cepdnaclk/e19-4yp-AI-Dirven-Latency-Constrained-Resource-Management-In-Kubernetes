@@ -4,7 +4,7 @@ metadata:
   name: reduce-cpu-s1-script
   namespace: default
 data:
-  reduce_cpu.sh: |
+  reduce_cpu_s1.sh: |
     #!/bin/bash
     DEPLOYMENT_NAME="service-1-deployment"
     NAMESPACE="default"
