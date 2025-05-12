@@ -11,7 +11,7 @@ class PasswordGeneratorUser(HttpUser):
     def generate_random_password(self):
         # Random length between 8 and 20
         length = randint(12, 25)
-        self.client.get(f"/password?length={length}")
+        self.client.get(f"/color/hex-to-rgb?hex=%23FF5733")
 
     def on_stop(self):
         # Perform any cleanup if necessary
@@ -20,13 +20,13 @@ class PasswordGeneratorUser(HttpUser):
 def run_locust_continuously():
     """Run Locust continuously with periodic user adjustments."""
     while True:
-        user_count = randint(10, 20)  # Random user count between 10 and 20
+        user_count = randint(1000, 2000)  # Random user count between 10 and 20
         print(f"Starting test with {user_count} users")
 
         # Start Locust in headless mode with the specified user count
         command = (
             f"locust -f locustfile.py --headless -u {user_count} -r 5 "
-            f"--run-time 30s --host=http://192.168.49.103:3003"
+            f"--run-time 300s --host=http://192.168.49.104:3015"
         )
         os.system(command)  # Execute the command to start the test
         time.sleep(30)  # Adjust the interval for changing users
