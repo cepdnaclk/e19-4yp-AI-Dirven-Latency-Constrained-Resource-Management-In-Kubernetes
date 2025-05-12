@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: color-code-converter-deployment
+  namespace: default
+  labels:
+    app: color-code-converter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: color-code-converter
+  template:
+    metadata:
+      labels:
+        app: color-code-converter
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "3015"
+    spec:
+      containers:
+        - name: color-code-converter-container
+          image: color-code-converter-image:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3015
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: color-code-converter-service
+  namespace: default
+  labels:
+    app: color-code-converter
+spec:
+  selector:
+    app: color-code-converter
+  ports:
+    - protocol: TCP
+      port: 3015
+      targetPort: 3015
+  type: LoadBalancer
