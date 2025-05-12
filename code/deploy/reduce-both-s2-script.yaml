@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reduce-both-s2-script
+  namespace: default
+data:
+  reduce_both_s2.sh: |
+    #!/bin/bash
+
+    DEPLOYMENT_NAME="service-2-deployment"
+    NAMESPACE="default"
+
+    # CPU reduction
+    CPU_LIMIT=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.limits.cpu}" | sed 's/m//')
+    CPU_REQUEST=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.requests.cpu}" | sed 's/m//')
+    CPU_MIN=120
+    CPU_NEW=$((CPU_LIMIT - 20))
+    if [ "$CPU_NEW" -lt "$CPU_MIN" ]; then
+      CPU_NEW=$CPU_MIN
+    fi
+    echo "Reducing CPU limit: $CPU_LIMIT → $CPU_NEW (minimum allowed: $CPU_MIN)"
+
+    # Memory reduction
+    MEM_LIMIT=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.limits.memory}" | sed 's/Mi//')
+    MEM_REQUEST=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.requests.memory}" | sed 's/Mi//')
+    MEM_MIN=156
+    MEM_NEW=$((MEM_LIMIT - 25))
+    if [ "$MEM_NEW" -lt "$MEM_MIN" ]; then
+      MEM_NEW=$MEM_MIN
+    fi
+    echo "Reducing memory limit: $MEM_LIMIT → $MEM_NEW (minimum allowed: $MEM_MIN)"
+
+    # Patch both CPU and memory in one request
+    kubectl patch deployment $DEPLOYMENT_NAME -n $NAMESPACE --type='json' -p="[
+      {\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/resources/limits/cpu\", \"value\": \"${CPU_NEW}m\"},
+      {\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/resources/limits/memory\", \"value\": \"${MEM_NEW}Mi\"}
+    ]"
