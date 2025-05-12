@@ -14,7 +14,7 @@ spec:
           containers:
             - name: reduce-mem
               image: bitnami/kubectl:latest
-              command: ["/bin/bash", "/scripts/reduce_cpu_s2.sh"]
+              command: ["/bin/bash", "/scripts/reduce_mem_s2.sh"]
               volumeMounts:
                 - name: script-volume
                   mountPath: /scripts
