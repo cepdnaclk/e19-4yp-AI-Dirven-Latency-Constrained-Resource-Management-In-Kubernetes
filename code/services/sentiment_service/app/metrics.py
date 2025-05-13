@@ -27,7 +27,7 @@ def collect_container_metrics():
         time.sleep(5)
 
 def start_metrics_server():
-    start_http_server(8001)
+    start_http_server(9090)
     thread = threading.Thread(target=collect_container_metrics)
     thread.daemon = True
     thread.start()
