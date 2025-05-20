@@ -10,8 +10,8 @@ data:
     NAMESPACE="default"
     MEM_LIMIT=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.limits.memory}" | sed 's/Mi//')
     MEM_REQUEST=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.requests.memory}" | sed 's/Mi//')
-    MEM_MIN=160  # Set the minimum allowed memory limit to 170Mi
-    MEM_NEW=$((MEM_LIMIT - 10))  # Always reduce by 10Mi
+    MEM_MIN=156  # Set the minimum allowed memory limit to 170Mi
+    MEM_NEW=$((MEM_LIMIT - 20))  # Always reduce by 10Mi
     if [ "$MEM_NEW" -lt "$MEM_MIN" ]; then
       MEM_NEW=$MEM_MIN  # Prevent reducing memory below 156Mi
     fi
