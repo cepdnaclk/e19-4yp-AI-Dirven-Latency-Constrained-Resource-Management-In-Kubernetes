@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: reduce-cpu-request-s1-cronjob
+  namespace: default
+spec:
+  schedule: "0 */3 * * *" # Runs every 3 hours
+  successfulJobsHistoryLimit: 10
+  failedJobsHistoryLimit: 10
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: reduce-cpu-request
+              image: bitnami/kubectl:latest
+              command: ["/bin/bash", "/scripts/reduce_cpu_request_s1.sh"]
+              volumeMounts:
+                - name: script-volume
+                  mountPath: /scripts
+          restartPolicy: OnFailure
+          serviceAccountName: default
+          volumes:
+            - name: script-volume
+              configMap:
+                name: reduce-cpu-request-s1-script
+                defaultMode: 0755
