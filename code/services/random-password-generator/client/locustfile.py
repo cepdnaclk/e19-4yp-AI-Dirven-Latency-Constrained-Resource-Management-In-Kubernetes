@@ -20,7 +20,8 @@ class PasswordGeneratorUser(HttpUser):
 def run_locust_continuously():
     """Run Locust continuously with periodic user adjustments."""
     while True:
-        user_count = randint(10, 20)  # Random user count between 10 and 20
+        # user_count = randint(10, 20)
+        user_count = 20  # Random user count between 10 and 20
         print(f"Starting test with {user_count} users")
 
         # Start Locust in headless mode with the specified user count

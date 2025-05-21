@@ -4,9 +4,9 @@ metadata:
   name: reduce-mem-cronjob
   namespace: default
 spec:
-  schedule: "0 */4 * * *"
-  successfulJobsHistoryLimit: 6
-  failedJobsHistoryLimit: 6
+  schedule: "0 */3 * * *"
+  successfulJobsHistoryLimit: 12
+  failedJobsHistoryLimit: 12
   jobTemplate:
     spec:
       template:
