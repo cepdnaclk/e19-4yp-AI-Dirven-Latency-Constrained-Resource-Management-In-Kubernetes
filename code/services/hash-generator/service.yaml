@@ -31,7 +31,7 @@ spec:
               memory: "128Mi"
             limits:
               cpu: "200m"
-              memory: "256Mi"
+              memory: "300Mi"
 ---
 apiVersion: v1
 kind: Service
