@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: reduce-memory-request-s2-cronjob
+  namespace: default
+spec:
+  schedule: "0 */3 * * *" # Runs every 3 hours
+  successfulJobsHistoryLimit: 10
+  failedJobsHistoryLimit: 10
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: reduce-memory-request
+              image: bitnami/kubectl:latest
+              command: ["/bin/bash", "/scripts/reduce_memory_request_s2.sh"]
+              volumeMounts:
+                - name: script-volume
+                  mountPath: /scripts
+          restartPolicy: OnFailure
+          serviceAccountName: default
+          volumes:
+            - name: script-volume
+              configMap:
+                name: reduce-memory-request-s2-script
+                defaultMode: 0755

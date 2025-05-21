@@ -10,8 +10,8 @@ class PasswordGeneratorUser(HttpUser):
     @task
     def generate_random_password(self):
         # Random length between 8 and 20
-        length = randint(12, 25)
-        self.client.get(f"/color/hex-to-rgb?hex=%23FF5733")
+        length = randint(25, 29)
+        self.client.get(f"/color/isPrime?number={length}")
 
     def on_stop(self):
         # Perform any cleanup if necessary
@@ -29,7 +29,7 @@ def run_locust_continuously():
             f"--run-time 300s --host=http://192.168.49.104:3015"
         )
         os.system(command)  # Execute the command to start the test
-        time.sleep(30)  # Adjust the interval for changing users
+        # time.sleep(30)  # Adjust the interval for changing users
 
 # Start the continuous running function
 if __name__ == "__main__":
