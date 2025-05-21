@@ -63,6 +63,11 @@ def get_container_memory_limit(pod):
     result = query_prometheus(query)
     return result[0]['value'][1] if result else "N/A"
 
+def get_rps(pod):
+    query = f'rate(http_server_requests_seconds_count{{pod=~"{pod}"}}[1m])'
+    result = query_prometheus(query)
+    return result[0]['value'][1] if result else "0"
+
 # Latency function for Java-based services
 def get_latency_java(pod):
     # Query for total request time in the last hour
@@ -105,7 +110,7 @@ def write_to_csv(data, service_name):
         # Write headers if the file is being created for the first time
         if not file_exists:
             headers = ["Timestamp", "Service", "CPU Request", "Memory Request", "CPU Limit", "Memory Limit",
-                       "Latency", "CPU Usage", "Memory Usage", "CPU Throttling", "Memory Working Set"]
+                       "Latency", "CPU Usage", "Memory Usage", "CPU Throttling", "Memory Working Set", "RPS"]
             writer.writerow(headers)
 
         writer.writerow(data)
@@ -131,6 +136,7 @@ def scrape_data(service_list, latency_func, interval=30):
             mem_result = get_container_memory_usage_bytes(pod)
             cpu_throttling = get_container_cpu_throttling(pod)
             mem_working_set = get_container_memory_working_set(pod)
+            rps = get_rps(pod)
 
             # Timestamp and values
             cpu_timestamp = datetime.fromtimestamp(float(cpu_result[0]['value'][0])).isoformat() if cpu_result else "N/A"
@@ -152,7 +158,8 @@ def scrape_data(service_list, latency_func, interval=30):
                 cpu_value,
                 mem_bytes,
                 cpu_throttling,
-                mem_working_set
+                mem_working_set,
+                rps
             ]
 
             write_to_csv(data, name)
