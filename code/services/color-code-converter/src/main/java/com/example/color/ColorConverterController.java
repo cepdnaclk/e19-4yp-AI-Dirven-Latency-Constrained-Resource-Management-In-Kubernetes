@@ -31,40 +31,18 @@ public class ColorConverterController {
         return result;
     }
 
-    @GetMapping("/isPrime")
-    public PrimeResponse isPrime(@RequestParam int number) {
-        boolean result = isPrimeRecursive(number, 2);
-        return new PrimeResponse(number, result);
+    @GetMapping("/n")
+    public Map<String, Integer> getNthFibonacci(@RequestParam int n) {
+        int result = fibonacci(n);
+        Map<String, Integer> response = new HashMap<>();
+        response.put("nthFibonacci", result);
+        return response;
     }
 
-    private boolean isPrimeRecursive(int number, int divisor) {
-        if (number <= 1) {
-            return false;
-        }
-        if (divisor * divisor > number) {
-            return true;
-        }
-        if (number % divisor == 0) {
-            return false;
-        }
-        return isPrimeRecursive(number, divisor + 1);
-    }
-
-    static class PrimeResponse {
-        private int number;
-        private boolean prime;
-
-        public PrimeResponse(int number, boolean prime) {
-            this.number = number;
-            this.prime = prime;
-        }
-
-        public int getNumber() {
-            return number;
-        }
-
-        public boolean isPrime() {
-            return prime;
-        }
+    // Recursive Fibonacci function
+    private int fibonacci(int n) {
+        if (n <= 0) return 0;
+        if (n == 1) return 1;
+        return fibonacci(n - 1) + fibonacci(n - 2);
     }
 }

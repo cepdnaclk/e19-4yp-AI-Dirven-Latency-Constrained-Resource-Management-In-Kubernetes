@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: reduce-both-request-s2-cronjob
+  namespace: default
+spec:
+  schedule: "0 */3 * * *" # Runs every 3 hours
+  successfulJobsHistoryLimit: 10
+  failedJobsHistoryLimit: 10
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: reduce-both-request
+              image: bitnami/kubectl:latest
+              command: ["/bin/bash", "/scripts/reduce_both_request_s2.sh"]
+              volumeMounts:
+                - name: script-volume
+                  mountPath: /scripts
+          restartPolicy: OnFailure
+          serviceAccountName: default
+          volumes:
+            - name: script-volume
+              configMap:
+                name: reduce-both-request-s2-script
+                defaultMode: 0755

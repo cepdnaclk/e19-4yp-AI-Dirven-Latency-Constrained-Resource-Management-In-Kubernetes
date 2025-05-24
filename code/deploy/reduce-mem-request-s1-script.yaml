@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reduce-memory-request-s1-script
+  namespace: default
+data:
+  reduce_memory_request_s1.sh: |
+    #!/bin/bash
+    DEPLOYMENT_NAME="service-1-deployment"
+    NAMESPACE="default"
+
+    # Get current memory request (strip 'Mi')
+    MEM_REQUEST=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.requests.memory}" | sed 's/Mi//')
+
+    MEM_MIN=64    # Minimum allowed memory request in Mi
+    MEM_STEP=32   # Reduce by 32Mi each time
+
+    # Calculate new value
+    MEM_NEW=$((MEM_REQUEST - MEM_STEP))
+    if [ "$MEM_NEW" -lt "$MEM_MIN" ]; then
+      MEM_NEW=$MEM_MIN
+    fi
+
+    echo "Reducing memory request: ${MEM_REQUEST}Mi → ${MEM_NEW}Mi (minimum allowed: ${MEM_MIN}Mi)"
+
+    # Patch the deployment with the new memory request
+    kubectl patch deployment $DEPLOYMENT_NAME -n $NAMESPACE --type='json' -p="[ 
+      {\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/resources/requests/memory\", \"value\": \"${MEM_NEW}Mi\"}
+    ]"

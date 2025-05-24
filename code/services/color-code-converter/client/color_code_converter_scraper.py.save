@@ -4,8 +4,14 @@ import threading
 from datetime import datetime
 import time
 import requests
+import pandas as pd
+from kubernetes import client, config
+from dash import Dash, dcc, html
+from dash.dependencies import Input, Output
+import plotly.graph_objs as go
 
 PROMETHEUS_URL = "http://localhost:9090"
+CSV_FILE = "color-code-converter-deployment_dataset.csv"
 
 JAVA_SERVICES = [
     {
@@ -15,8 +21,96 @@ JAVA_SERVICES = [
         "namespace": "default"
     }
 ]
+last_scaling_time=0
+old_limit=0
 
-# Query Prometheus function
+from kubernetes import client, config
+
+def check_patch_permission(deployment_name, namespace):
+    """
+    Checks if the current user/service account has permission to patch deployments.
+    """
+    try:
+        config.load_incluster_config()
+    except:
+        config.load_kube_config()
+
+    auth_api = client.AuthorizationV1Api()
+
+    review = client.V1SelfSubjectAccessReview(
+        spec=client.V1SelfSubjectAccessReviewSpec(
+            resource_attributes=client.V1ResourceAttributes(
+                namespace=namespace,
+                verb="patch",
+                group="apps",
+                resource="deployments",
+                name=deployment_name
+            )
+        )
+    )
+
+    resp = auth_api.create_self_subject_access_review(review)
+    allowed = resp.status.allowed
+
+    if allowed:
+        print(f"? Permission granted to patch deployment '{deployment_name}' in namespace '{namespace}'")
+    else:
+        print(f"? Permission denied to patch deployment '{deployment_name}' in namespace '{namespace}'")
+    return allowed
+
+
+def update_cpu_limit(deployment_name, namespace, new_millicores, max_cpu_millicores=550,min_cpu_millicores=100):
+    """
+    Decreases the CPU limit of a deployment by a specified amount of millicores,
+    but ensures it doesn't go below a minimum value.
+    """
+
+    # Load config
+    try:
+        config.load_incluster_config()
+    except:
+        config.load_kube_config()
+
+    if not check_patch_permission(deployment_name, namespace):
+        print("?? Exiting: insufficient permissions.")
+        return
+
+    apps_v1 = client.AppsV1Api()
+
+    # Get current deployment
+    try:
+        deployment = apps_v1.read_namespaced_deployment(deployment_name, namespace)
+        container = deployment.spec.template.spec.containers[0]
+
+        current_cpu = container.resources.limits.get("cpu", "0m")
+        current_cpu_m = int(current_cpu.replace("m", "")) if "m" in current_cpu else int(float(current_cpu) * 1000)
+
+        new_cpu_m = min(max(new_millicores,min_cpu_millicores), max_cpu_millicores)
+
+        print(f"?? New CPU limit: {current_cpu_m}m ? {new_cpu_m}m")
+
+        # Patch to apply the new CPU limit
+        patch = [
+            {
+                "op": "replace",
+                "path": "/spec/template/spec/containers/0/resources/limits/cpu",
+                "value": f"{new_cpu_m}m"
+            }
+        ]
+
+        apps_v1.patch_namespaced_deployment(
+            name=deployment_name,
+            namespace=namespace,
+            body=patch
+        )
+
+        print(f"? Successfully updated CPU limit to {new_cpu_m}m for {deployment_name}")
+
+    except Exception as e:
+        print(f"? Failed to update CPU limit for {deployment_name}: {e}")
+
+
+
 def query_prometheus(query):
     response = requests.get(f"{PROMETHEUS_URL}/api/v1/query", params={"query": query})
     if response.status_code == 200:
@@ -24,100 +118,182 @@ def query_prometheus(query):
     else:
         raise Exception(f"Query failed: {response.status_code} {response.text}")
 
-# CPU Usage function for the container
 def get_container_cpu_usage(pod):
-    query = (
-        f'sum(rate(container_cpu_usage_seconds_total{{'
-        f'pod=~"{pod}"}}[1h]))'
-    )
-    result = query_prometheus(query)
-    return result if result else None
+    query = f'sum(rate(container_cpu_usage_seconds_total{{pod=~"{pod}"}}[5m]))'
+    return query_prometheus(query)
 
-# Memory usage in bytes function for the container
 def get_container_memory_usage_bytes(pod):
     query = f'container_memory_usage_bytes{{pod=~"{pod}"}}'
-    result = query_prometheus(query)
-    return result if result else None
+    return query_prometheus(query)
 
-# CPU Request function for the container
 def get_container_cpu_request(pod):
     query = f'kube_pod_container_resource_requests{{pod=~"{pod}", resource="cpu", unit="core"}}'
     result = query_prometheus(query)
     return result[0]['value'][1] if result else "N/A"
 
-# Memory Request function for the container
 def get_container_memory_request(pod):
     query = f'kube_pod_container_resource_requests{{pod=~"{pod}", resource="memory", unit="byte"}}'
     result = query_prometheus(query)
     return result[0]['value'][1] if result else "N/A"
 
-# CPU Limit function for the container
 def get_container_cpu_limit(pod):
     query = f'kube_pod_container_resource_limits{{pod=~"{pod}", resource="cpu", unit="core"}}'
     result = query_prometheus(query)
     return result[0]['value'][1] if result else "N/A"
 
-# Memory Limit function for the container
 def get_container_memory_limit(pod):
     query = f'kube_pod_container_resource_limits{{pod=~"{pod}", resource="memory", unit="byte"}}'
     result = query_prometheus(query)
     return result[0]['value'][1] if result else "N/A"
 
-# Latency function for Java-based services
 def get_latency_java(pod):
-    # Query for total request time in the last hour
-    latency_sum_query = (
-        f'sum(rate(http_server_requests_seconds_sum{{pod=~"{pod}"}}[1h])) '
-        f'/ sum(rate(http_server_requests_seconds_count{{pod=~"{pod}", outcome="SUCCESS"}}[1h]))'
+    query = (
+        f'sum(rate(http_server_requests_seconds_sum{{pod=~"{pod}"}}[5m])) '
+        f'/ sum(rate(http_server_requests_seconds_count{{pod=~"{pod}", outcome="SUCCESS"}}[5m]))'
     )
+    result = query_prometheus(query)
+    return float(result[0]['value'][1]) if result else 0
 
-    # Fetch the data for the query
-    result = query_prometheus(latency_sum_query)
-
-    # If the query returns results, calculate the average latency per request
-    if result:
-        # Extract the value from the result
-        avg_latency_per_request = float(result[0]['value'][1])  # Average latency per request
-        return avg_latency_per_request
-    else:
-        return 0  # If no data is returned, return 0
-
-# Function to handle CPU Throttling (CFS Throttling)
 def get_container_cpu_throttling(pod):
     query = f'container_cpu_cfs_throttled_seconds_total{{pod=~"{pod}"}}'
     result = query_prometheus(query)
     return result[0]['value'][1] if result else "N/A"
 
-# Function to handle Memory Working Set (active memory excluding cached)
 def get_container_memory_working_set(pod):
     query = f'container_memory_working_set_bytes{{pod=~"{pod}"}}'
     result = query_prometheus(query)
     return result[0]['value'][1] if result else "N/A"
 
-# Function to write data to CSV for each service
 def write_to_csv(data, service_name):
     file_name = f"{service_name}_dataset.csv"
     file_exists = os.path.isfile(file_name)
-
     with open(file_name, mode='a', newline='') as file:
         writer = csv.writer(file)
-
-        # Write headers if the file is being created for the first time
         if not file_exists:
-            headers = ["Timestamp", "Service", "CPU Request", "Memory Request", "CPU Limit", "Memory Limit",
-                       "Latency", "CPU Usage", "Memory Usage", "CPU Throttling", "Memory Working Set"]
-            writer.writerow(headers)
-
+            writer.writerow([
+                "Timestamp", "Service", "CPU Request", "Memory Request",
+                "CPU Limit", "Memory Limit", "Latency",
+                "CPU Usage", "Memory Usage", "CPU Throttling", "Memory Working Set"
+            ])
         writer.writerow(data)
 
-# Function to scrape data
-def scrape_data(service_list, latency_func, interval=30):
+def scrape_data(service_list, latency_func, interval=1):
+    global last_scaling_time,old_limit
     while True:
         for service in service_list:
             pod = service["pod"]
             name = service["name"]
-
-            # Requests and Limits
             cpu_request = get_container_cpu_request(pod)
             mem_request = get_container_memory_request(pod)
-            cpu_limit = get_container_cpu_limi
+            cpu_limit = get_container_cpu_limit(pod)
+            mem_limit = get_container_memory_limit(pod)
+            latency = latency_func(pod)
+            cpu_result = get_container_cpu_usage(pod)
+            mem_result = get_container_memory_usage_bytes(pod)
+            cpu_throttling = get_container_cpu_throttling(pod)
+            mem_working_set = get_container_memory_working_set(pod)
+
+            cpu_timestamp = datetime.fromtimestamp(float(cpu_result[0]['value'][0])).isoformat() if cpu_result else "N/A"
+            cpu_value = cpu_result[0]['value'][1] if cpu_result else "N/A"
+            mem_timestamp = datetime.fromtimestamp(float(mem_result[0]['value'][0])).isoformat() if mem_result else "N/A"
+            mem_bytes = mem_result[0]['value'][1] if mem_result else "N/A"
+            timestamp = cpu_timestamp if cpu_timestamp != "N/A" else mem_timestamp
+
+            # --- Auto-scaling logic ---
+            try: 
+              if time.time() - last_scaling_time >= 30:
+                cpu_limit_float = float(cpu_limit)
+                if cpu_limit_float > 0 and float(cpu_value) > 0.8 * cpu_limit_float:
+                    new_limit = round(cpu_limit_float * 1.2, 2)  # max 0.5 cores
+                    if old_limit!=new_limit:
+                      old_limit=new_limit
+                      update_cpu_limit(JAVA_SERVICES[0]["name"], JAVA_SERVICES[0]["namespace"],new_limit*1000,550,100)
+                      print(f"increased{cpu_value} and {cpu_limit_float}")
+                      last_scaling_time=time.time()
+                elif cpu_limit_float > 0 and float(cpu_value) < 0.4 * cpu_limit_float:
+                    new_limit = round(cpu_limit_float * 0.8, 2)
+                    if old_limit!=new_limit:
+                      old_limit=new_limit
+                      update_cpu_limit(JAVA_SERVICES[0]["name"], JAVA_SERVICES[0]["namespace"],new_limit*1000,550,100)
+                      print(f"decreased{cpu_value} and {cpu_limit_float}")
+                      last_scaling_time=time.time()
+            except Exception as e:
+              print(f"?? Error in CPU scaling check: {e}")
+
+
+            data = [
+                timestamp, name, cpu_request, mem_request, cpu_limit, mem_limit,
+                latency, cpu_value, mem_bytes, cpu_throttling, mem_working_set
+            ]
+            write_to_csv(data, name)
+        time.sleep(interval)
+
+# ----------------- DASH APP -------------------
+app = Dash(__name__)
+app.layout = html.Div([
+    html.H2("Real-time Resource Usage - Color Code Converter"),
+    dcc.Interval(id='interval-component', interval=1000, n_intervals=0),
+
+    html.Div([
+        dcc.Graph(id='cpu-graph'),
+        dcc.Graph(id='memory-graph'),
+        dcc.Graph(id='latency-graph')
+    ])
+])
+
+@app.callback(
+    Output('cpu-graph', 'figure'),
+    Output('memory-graph', 'figure'),
+    Output('latency-graph', 'figure'),
+    Input('interval-component', 'n_intervals')
+)
+def update_graphs(n):
+    if not os.path.exists(CSV_FILE):
+        return go.Figure(), go.Figure(), go.Figure()
+
+    df = pd.read_csv(CSV_FILE)
+    df = df.tail(100)
+
+    # Convert numeric columns
+    for col in ["CPU Request", "CPU Limit", "CPU Usage",
+                "Memory Request", "Memory Limit", "Memory Usage", "Latency"]:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+
+    # CPU Graph
+    cpu_fig = go.Figure()
+    cpu_fig.add_trace(go.Scatter(x=df["Timestamp"], y=df["CPU Request"], mode='lines+markers', name='CPU Request'))
+    cpu_fig.add_trace(go.Scatter(x=df["Timestamp"], y=df["CPU Limit"], mode='lines+markers', name='CPU Limit'))
+    cpu_fig.add_trace(go.Scatter(x=df["Timestamp"], y=df["CPU Usage"], mode='lines+markers', name='CPU Usage'))
+    cpu_fig.update_layout(title="CPU Metrics", xaxis_title="Timestamp", yaxis_title="CPU (cores)")
+
+    # Memory Graph
+    memory_fig = go.Figure()
+    memory_fig.add_trace(go.Scatter(x=df["Timestamp"], y=df["Memory Request"], mode='lines+markers', name='Memory Request'))
+    memory_fig.add_trace(go.Scatter(x=df["Timestamp"], y=df["Memory Limit"], mode='lines+markers', name='Memory Limit'))
+    memory_fig.add_trace(go.Scatter(x=df["Timestamp"], y=df["Memory Usage"], mode='lines+markers', name='Memory Usage'))
+    memory_fig.update_layout(title="Memory Metrics", xaxis_title="Timestamp", yaxis_title="Memory (bytes)")
+
+    # Latency Graph
+    latency_fig = go.Figure()
+    latency_fig.add_trace(go.Scatter(x=df["Timestamp"], y=df["Latency"], mode='lines+markers', name='Latency'))
+    latency_fig.update_layout(title="Latency", xaxis_title="Timestamp", yaxis_title="Seconds")
+
+    return cpu_fig, memory_fig, latency_fig
+
+
+def start_dash():
+    app.run(debug=False, host='0.0.0.0', port=8050)
+
+# ---------------- MAIN -------------------
+def main():
+    t1 = threading.Thread(target=scrape_data, args=(JAVA_SERVICES, get_latency_java))
+    t2 = threading.Thread(target=start_dash)
+
+    t1.start()
+    t2.start()
+
+    t1.join()
+    t2.join()
+
+if __name__ == "__main__":
+    main()

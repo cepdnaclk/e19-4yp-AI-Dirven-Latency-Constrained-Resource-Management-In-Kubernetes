@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reduce-both-request-s2-script
+  namespace: default
+data:
+  reduce_both_request_s2.sh: |
+    #!/bin/bash
+    DEPLOYMENT_NAME="service-2-deployment"
+    NAMESPACE="default"
+
+    # Get current CPU and memory requests
+    CPU_REQUEST=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.requests.cpu}" | sed 's/m//')
+    MEM_REQUEST=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.requests.memory}" | sed 's/Mi//')
+
+    # Define target minimums and step sizes
+    CPU_MIN=50
+    CPU_STEP=10
+
+    MEM_MIN=68
+    MEM_STEP=12
+
+    # Calculate new CPU request
+    CPU_NEW=$((CPU_REQUEST - CPU_STEP))
+    if [ "$CPU_NEW" -lt "$CPU_MIN" ]; then
+      CPU_NEW=$CPU_MIN
+    fi
+
+    # Calculate new memory request
+    MEM_NEW=$((MEM_REQUEST - MEM_STEP))
+    if [ "$MEM_NEW" -lt "$MEM_MIN" ]; then
+      MEM_NEW=$MEM_MIN
+    fi
+
+    echo "Reducing CPU request: ${CPU_REQUEST}m → ${CPU_NEW}m (min: ${CPU_MIN}m)"
+    echo "Reducing Memory request: ${MEM_REQUEST}Mi → ${MEM_NEW}Mi (min: ${MEM_MIN}Mi)"
+
+    # Apply the patch to the deployment
+    kubectl patch deployment $DEPLOYMENT_NAME -n $NAMESPACE --type='json' -p="[
+      {\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/resources/requests/cpu\", \"value\": \"${CPU_NEW}m\"},
+      {\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/resources/requests/memory\", \"value\": \"${MEM_NEW}Mi\"}
+    ]"

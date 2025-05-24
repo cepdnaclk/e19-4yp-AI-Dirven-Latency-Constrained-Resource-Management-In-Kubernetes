@@ -1,3 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-1-service
+  namespace: default
+  labels:
+    app: service-1
+spec:
+  selector:
+    app: service-1
+  ports:
+    - protocol: TCP
+      port: 3005
+      targetPort: 3005
+  type: LoadBalancer
+=======
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -42,9 +58,10 @@ metadata:
     app: service-1
 spec:
   selector:
-    app: service-1
+    app: hash-gen
   ports:
     - protocol: TCP
       port: 3005
       targetPort: 3005
   type: LoadBalancer
+

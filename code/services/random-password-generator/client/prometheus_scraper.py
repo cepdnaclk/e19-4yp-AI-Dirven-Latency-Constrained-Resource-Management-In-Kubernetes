@@ -99,6 +99,11 @@ def get_container_memory_working_set(pod):
     result = query_prometheus(query)
     return result[0]['value'][1] if result else "N/A"
 
+def get_rps(pod):
+    query = f'rate(http_server_requests_seconds_count{{pod=~"{pod}"}}[1m])'
+    result = query_prometheus(query)
+    return result[0]['value'][1] if result else "0"
+
 # Function to write data to CSV for each service
 def write_to_csv(data, service_name):
     file_name = f"{service_name}_dataset.csv"

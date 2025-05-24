@@ -1,36 +1,42 @@
 from locust import HttpUser, task, between
-from random import randint
+from random import randint, choice
 import time
 import os
 
 class PasswordGeneratorUser(HttpUser):
-    # Simulate a wait time between 1 and 5 seconds between tasks
-    wait_time = between(1, 5)
+    wait_time = between(1, 3)
 
     @task
-    def generate_random_password(self):
-        # Random length between 8 and 20
-        length = randint(12, 25)
-        self.client.get(f"/color/hex-to-rgb?hex=%23FF5733")
+    def check_prime(self):
+        number = randint(30, 35)  # Moderately large to cause some CPU load
+        self.client.get(f"/color/n?n={number}")
 
     def on_stop(self):
-        # Perform any cleanup if necessary
         pass
 
-def run_locust_continuously():
-    """Run Locust continuously with periodic user adjustments."""
+def run_locust_fluctuating_workload():
+    """Run Locust with fluctuating users via random walk logic."""
+    min_users = 15
+    max_users = 50
+    user_count = 30  # Start at mid-point
+    user_step = 1
+
     while True:
-        user_count = randint(1000, 2000)  # Random user count between 10 and 20
-        print(f"Starting test with {user_count} users")
+        # Random walk: increase or decrease users within bounds
+        user_count += choice([-user_step, user_step])
+        user_count = max(min_users, min(max_users, user_count))
 
-        # Start Locust in headless mode with the specified user count
+        #print(f"[INFO] Running test with {user_count} users")
+
         command = (
-            f"locust -f locustfile.py --headless -u {user_count} -r 5 "
-            f"--run-time 300s --host=http://192.168.49.104:3015"
+            f"locust -f locustfile.py --headless -u {user_count} -r 3 "
+            f"--run-time 60s --host=http://192.168.49.104:3015"
         )
-        os.system(command)  # Execute the command to start the test
-        time.sleep(30)  # Adjust the interval for changing users
+        os.system(command)
 
-# Start the continuous running function
+        sleep_interval = randint(15, 30)  # Cool-down to prevent overload
+        print(f"[INFO] Sleeping for {sleep_interval} seconds before next run...")
+        #time.sleep(sleep_interval)
+
 if __name__ == "__main__":
-    run_locust_continuously()
+    run_locust_fluctuating_workload()
