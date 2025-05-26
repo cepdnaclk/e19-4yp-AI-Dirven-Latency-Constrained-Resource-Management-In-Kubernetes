@@ -63,6 +63,11 @@ def get_container_memory_limit(pod):
     result = query_prometheus(query)
     return result[0]['value'][1] if result else "N/A"
 
+def get_rps(pod):
+    query = f'rate(http_server_requests_seconds_count{{pod=~"{pod}"}}[1m])'
+    result = query_prometheus(query)
+    return result[0]['value'][1] if result else "0"
+
 # Latency function for Java-based services
 def get_latency_java(pod):
     # Query for total request time in the last hour

@@ -79,7 +79,9 @@ def get_latency_java(pod):
 
 # Function to write data to CSV for each service
 def write_to_csv(data, service_name):
+
     file_name = f"{service_name}memory_reduction_without_throttling_dataset.csv"
+
     file_exists = os.path.isfile(file_name)
 
     with open(file_name, mode='a', newline='') as file:
