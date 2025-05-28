@@ -94,6 +94,18 @@ to maintain system responsiveness while optimizing resource distribution to prev
 bottlenecks 
 ![Latency-Constrained Optimizer](./images/latencyconstrainedoptimizer.png)
 
+### Reinforcement Learning-Based Decision Maker
+This module operates at both the pod level and within the Custom Controller. At the 
+pod level, a reinforcement learning model using Deep Q Networks learns the optimal 
+scaling policy based on historical and real-time data. At the node level, the RL model 
+aggregates feedback from individual pods and collaborates with the 
+Latency-Constrained Optimizer to refine global scaling decisions. The reward 
+function penalizes actions leading to excessive latency, ensuring both resource 
+efficiency and latency awareness in all decisions. Additionally, the RL model 
+continuously refines its decision-making process, adapting to evolving system 
+conditions and optimizing scaling policies to meet long-term performance goals. 
+![Reinforcement Learning-Based Decision Maker](./images/reinforcementlearningbaseddecisionmaker.png)
+
 ## Experiment Setup and Implementation
 
 ## Results and Analysis
