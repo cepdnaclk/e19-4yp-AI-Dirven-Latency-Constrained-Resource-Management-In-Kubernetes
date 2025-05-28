@@ -161,7 +161,13 @@ Nonlinear and sometimes adaptive behavior observed. For example, the JVM improve
 | Password Generator | Step-wise spikes | Bursty | Unexpected dips |
 
 ## Conclusion
+This research reveals that Kubernetes resource tuning is not linear or generic. Different microservices have distinct performance profiles, and static autoscaling is insufficient. We demonstrate that intelligent resource tuning must:
 
+* Respect latency thresholds.
+* Detect nonlinear degradation points.
+* Adapt dynamically to workload and service architecture.
+
+Our findings will power a machine learning–driven, SLA-aware resource optimizer that can be integrated into Kubernetes platforms like Choreo, enabling developers to reduce cost without compromising performance.
 
 ## Publications
 [//]: # "Note: Uncomment each once you uploaded the files to the repository"
