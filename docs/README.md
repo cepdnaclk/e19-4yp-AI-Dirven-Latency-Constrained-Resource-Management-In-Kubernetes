@@ -107,6 +107,27 @@ conditions and optimizing scaling policies to meet long-term performance goals.
 ![Reinforcement Learning-Based Decision Maker](./images/reinforcementlearningbaseddecisionmaker.png)
 
 ## Experiment Setup and Implementation
+### Services Tested:
+
+1. Prime Verifier (Java)
+2. Echo (Go)
+3. Hash Generator (Java)
+4. Password Generator (Java)
+
+### Load Generation: 
+Constant 10–20 requests/sec per service.
+
+### Metrics Collected:
+
+* CPU Usage, CPU Limit, Memory Usage, Memory Limit
+* Latency (p95), timestamped at regular intervals
+
+### Automation Tools:
+
+* Custom Kubernetes cronjobs for reduction
+* Prometheus for monitoring
+* Python & Matplotlib for visualization
+* Bash/ConfigMaps for limit patching
 
 ## Results and Analysis
 
