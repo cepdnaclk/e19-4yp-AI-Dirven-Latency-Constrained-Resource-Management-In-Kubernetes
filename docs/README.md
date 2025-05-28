@@ -75,6 +75,13 @@ takes to allocate the necessary resources, thus decreasing startup latency and
 improving the overall responsiveness of the system. 
 ![Cold Start Mitigation Module](./images/coldstartmitigationmodule.png)
 
+### Dependency-Aware Scaling Module
+The Dependency-Aware Scaling Module is deployed at the node level as part of the 
+Custom Controller. It leverages distributed tracing tools like Jaeger and 
+OpenTelemetry to map inter-service dependencies and identify critical microservices. 
+This module ensures that tightly coupled services are allocated prioritized resources,  preventing scaling actions from negatively affecting dependent services and 
+maintaining system balance and efficiency. 
+
 ## Experiment Setup and Implementation
 
 ## Results and Analysis
