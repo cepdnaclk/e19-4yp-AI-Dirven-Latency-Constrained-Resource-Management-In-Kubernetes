@@ -81,6 +81,18 @@ Custom Controller. It leverages distributed tracing tools like Jaeger and
 OpenTelemetry to map inter-service dependencies and identify critical microservices. 
 This module ensures that tightly coupled services are allocated prioritized resources,  preventing scaling actions from negatively affecting dependent services and 
 maintaining system balance and efficiency. 
+![Dependency-Aware Scaling Module](./images/dependencyawarescalingmodule.png)
+
+### Latency Constrained Optimizer
+Also part of the Custom Controller, the Latency-Constrained Optimizer utilizes 
+metaheuristic algorithms, such as Genetic Algorithms (GA) and Simulated Annealing 
+(SA), to determine the optimal allocation of CPU and memory resources across the 
+node. The optimizer ensures that scaling decisions do not increase latency by more 
+than a given threshold. It incorporates a latency prediction model to estimate the impact of resource changes before applying them. By constantly evaluating resource 
+adjustments and their potential impact on overall system latency, the optimizer strives 
+to maintain system responsiveness while optimizing resource distribution to prevent 
+bottlenecks 
+![Latency-Constrained Optimizer](./images/latencyconstrainedoptimizer.png)
 
 ## Experiment Setup and Implementation
 
