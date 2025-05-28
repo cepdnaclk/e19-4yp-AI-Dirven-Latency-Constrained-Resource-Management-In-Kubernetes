@@ -73,7 +73,7 @@ become operational without causing service interruptions or performance degradat
 Moreover, by predicting resource needs in advance, the system can reduce the time it 
 takes to allocate the necessary resources, thus decreasing startup latency and 
 improving the overall responsiveness of the system. 
-
+![Cold Start Mitigation Module](./images/coldstartmitigationmodule.png)
 
 ## Experiment Setup and Implementation
 
