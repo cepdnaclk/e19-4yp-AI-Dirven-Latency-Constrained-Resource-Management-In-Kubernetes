@@ -131,7 +131,37 @@ Constant 10–20 requests/sec per service.
 
 ## Results and Analysis
 
+### Latency Profiles
+
+#### CPU-bound Services
+- **Prime Verifier**
+- **Hash Generator**
+
+#### Memory-resilient Services
+- **Echo**
+- **Password Generator**
+
+**Note:** Echo remained stable under all reductions.
+
+### Critical Reduction Points (CRPs)
+
+Small additional reductions beyond CRP caused exponential latency spikes.
+
+### Combined Reductions
+
+Nonlinear and sometimes adaptive behavior observed. For example, the JVM improved under tighter GC pressure.
+
+### Comparative Analysis
+
+| Service | CPU-Only | Memory-Only | Combined |
+|---------|----------|-------------|----------|
+| Prime Verifier | Gradual spike | Mild | Latency cliff |
+| Echo (Go) | No change | No change | Very stable |
+| Hash Generator | Immediate spikes | Flat → volatile | Chaotic |
+| Password Generator | Step-wise spikes | Bursty | Unexpected dips |
+
 ## Conclusion
+
 
 ## Publications
 [//]: # "Note: Uncomment each once you uploaded the files to the repository"
