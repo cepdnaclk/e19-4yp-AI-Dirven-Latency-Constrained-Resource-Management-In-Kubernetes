@@ -59,6 +59,12 @@ This work contributes a hybrid of empirical workload characterization and intell
 
 ## Methodology
 
+### Workload Profiler
+The Workload Profiler resides inside each pod and continuously monitors real-time 
+metrics. These metrics are gathered using Prometheus, Kubernetes API, 
+OpenTelemetry and serve as the foundation for predicting future resource demands.  
+![Workload Profiler](./images/workloadprofiler.png) 
+
 ## Experiment Setup and Implementation
 
 ## Results and Analysis
