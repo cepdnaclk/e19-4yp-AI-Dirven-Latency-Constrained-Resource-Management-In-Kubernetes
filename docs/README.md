@@ -45,6 +45,26 @@ This is a sample image, to show how to add images to your page. To learn more op
 
 ## Abstract
 
+Efficient resource management in Kubernetes clusters is crucial for modern 
+cloud-native applications, where dynamic scaling must adapt to fluctuating demands 
+while minimizing latency and cost. Traditional autoscaling methods, like Horizontal 
+Pod Autoscaler (HPA) and Vertical Pod Autoscaler (VPA), rely on basic resource 
+metrics such as CPU and memory usage. While these methods are effective in many 
+cases, they often struggle to handle complex, real-time applications with 
+unpredictable traffic patterns and latency-sensitive workloads. 
+Recent developments in machine learning (ML) and reinforcement learning (RL) 
+offer adaptive, data-driven solutions to improve autoscaling in Kubernetes 
+environments. ML models can predict future resource needs, allowing for proactive 
+resource allocation before performance issues arise. RL-based approaches enable 
+dynamic optimization, adjusting resource allocations based on continuous feedback 
+from system performance. 
+However, challenges persist, especially regarding latency-aware scaling and workload 
+prediction. Existing solutions often fail to integrate latency constraints or struggle to 
+predict traffic patterns accurately. This literature review explores recent advancements 
+in Kubernetes autoscaling, examining ML and RL techniques, hybrid approaches, and 
+their limitations. This aims to highlight the progress made and the gaps that remain in 
+developing efficient and adaptive autoscaling strategies for Kubernetes clusters. 
+
 ## Related works
 
 ## Methodology
