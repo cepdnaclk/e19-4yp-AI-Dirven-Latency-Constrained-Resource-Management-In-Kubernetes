@@ -65,6 +65,16 @@ metrics. These metrics are gathered using Prometheus, Kubernetes API,
 OpenTelemetry and serve as the foundation for predicting future resource demands.  
 ![Workload Profiler](./images/workloadprofiler.png) 
 
+### Cold-Start Mitigation Module
+This module is also deployed within each pod to reduce the delays associated with 
+starting new pods. By using pre-trained models and incremental online learning 
+techniques, it predicts the resource requirements of a pod before it starts, enabling  proactive resource pre-allocation. This approach ensures that new pods can quickly 
+become operational without causing service interruptions or performance degradation. 
+Moreover, by predicting resource needs in advance, the system can reduce the time it 
+takes to allocate the necessary resources, thus decreasing startup latency and 
+improving the overall responsiveness of the system. 
+
+
 ## Experiment Setup and Implementation
 
 ## Results and Analysis
