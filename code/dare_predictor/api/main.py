@@ -5,11 +5,11 @@ from trend_learner.predictor import get_safe_resource_ranges
 
 app = FastAPI(title="DARE Trend Learner API")
 
-# Global TL instance (you can later make this per-service/microservice)
+# Global TL instance (we can later make this per-service/microservice)
 tl = TrendLearner()
 
 class MetricInput(BaseModel):
-    req_rate: float
+    #req_rate: float
     timestamp: float
     cpu_usage: float
     mem_usage: float
@@ -23,8 +23,9 @@ class PredictionOutput(BaseModel):
 def predict_trend(data: MetricInput):
     try:
         # Update the TL with current usage
-        tl.update(data.req_rate, data.timestamp, data.cpu_usage, data.mem_usage)
-
+        #tl.update(data.req_rate, data.timestamp, data.cpu_usage, data.mem_usage)
+        tl.update(data.timestamp, data.cpu_usage, data.mem_usage)
+        
         # Predict next-step usage
         cpu_pred, mem_pred = tl.predict_next(data.req_rate, data.timestamp + 1)
 
@@ -38,3 +39,7 @@ def predict_trend(data: MetricInput):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/")
+def root():
+    return {"message": "DARE Trend Learner API is running. Use POST /predict"}
