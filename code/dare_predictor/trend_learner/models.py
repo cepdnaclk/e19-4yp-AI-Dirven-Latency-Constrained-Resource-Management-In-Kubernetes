@@ -14,3 +14,8 @@ class OnlineLinearRegressor:
         y_pred = np.dot(self.weights, x)
         error = usage - y_pred
         self.weights += self.learning_rate * error * x
+        
+class EMA:
+    def __init__(self, alpha=0.3):
+        self.alpha = alpha
+        self.last = None
