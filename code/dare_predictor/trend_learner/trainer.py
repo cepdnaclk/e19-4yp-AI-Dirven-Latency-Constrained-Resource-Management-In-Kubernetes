@@ -15,3 +15,8 @@ class TrendLearner:
         cpu_trend = self.cpu_ema.update(cpu_usage) if self.use_ema else cpu_usage
         mem_trend = self.mem_ema.update(mem_usage) if self.use_ema else mem_usage
         return cpu_trend, mem_trend
+    
+    def predict_next(self, req_rate, next_time):
+        cpu_pred = self.cpu_model.predict(req_rate, next_time)
+        mem_pred = self.mem_model.predict(req_rate, next_time)
+        return cpu_pred, mem_pred
