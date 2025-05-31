@@ -1,0 +1,5 @@
+trend_learner:
+  learning_rate: 0.001
+  ema_alpha: 0.3
+  prediction_horizon: 1  # step forward
+  tolerance_percent: 20
