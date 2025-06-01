@@ -1,7 +1,7 @@
 from .model import TrendLearner
 import numpy as np
 
-def update_model_online(model_path, new_data_point):
+def update_model_online(model_path, scaler_path, new_data_point):
     model = TrendLearner.load(model_path)
 
     X = np.array([[
