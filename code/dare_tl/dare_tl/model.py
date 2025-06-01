@@ -46,8 +46,12 @@ class TrendLearner:
         
     @staticmethod
     def load(path):
-        import dare_tl.model as model_module
-        sys.modules['model'] = model_module  # spoof the module path
+        """Load model from file"""
+        try:
+            import dare_tl.model as model_module
+            sys.modules['model'] = model_module  # spoof the module path
+        except ImportError:
+            pass  # Module might not exist in package structure
         return load(path)
     
     def safe_range(self, pred_cpu, pred_mem, cpu_margin=0.1, mem_margin=0.1):
