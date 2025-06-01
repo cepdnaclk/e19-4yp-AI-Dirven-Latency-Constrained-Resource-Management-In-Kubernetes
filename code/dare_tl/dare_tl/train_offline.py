@@ -16,14 +16,22 @@ y_mem = df["Memory_Usage_Delta"].values
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(features)
 
+# Create models directory if it doesn't exist
+os.makedirs("models", exist_ok=True)
+
 # Save scaler for inference
 joblib.dump(scaler, "models/scaler.pkl")
 
 tl = TrendLearner()
 tl.train(X_scaled, y_cpu, y_mem)
 
-# Create models directory if it doesn't exist
-os.makedirs("models", exist_ok=True)
+
 
 tl.save("models/tl_model.pkl")
 print("Offline training complete and model saved.")
+
+# Save trained model
+tl.save("models/tl_model.pkl")
+print("Offline training complete and model saved.")
+print(f"Training data shape: {features.shape}")
+print(f"Feature columns: CPU_Usage, Memory_Usage, RequestRate, CPU_Limit, Memory_Limit")

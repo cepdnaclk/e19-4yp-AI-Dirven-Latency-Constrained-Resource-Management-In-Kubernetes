@@ -24,8 +24,8 @@ def predict(input: UsageInput):
     X_scaled = scaler.transform(X)
     pred_cpu_delta, pred_mem_delta = model.predict_usage(X_scaled)
 
-    future_cpu = input.CPU_Usage + pred_cpu_delta[0]
-    future_mem = input.Memory_Usage + pred_mem_delta[0]
+    future_cpu = input.CPU_Usage + (pred_cpu_delta[0] if pred_cpu_delta is not None else 0)
+    future_mem = max(0, input.Memory_Usage + (pred_mem_delta[0] if pred_mem_delta is not None else 0))
     safe_range = model.safe_range(future_cpu, future_mem)
 
     return {
