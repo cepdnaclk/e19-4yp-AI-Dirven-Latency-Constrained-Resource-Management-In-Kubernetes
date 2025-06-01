@@ -20,16 +20,26 @@ class PredictionResponse(BaseModel):
     safe_range: dict
     status: str
     
-app.get("/")
-def root():
-    return {"message": "Resource Usage Prediction API", "status": "running"}
-
 class UsageInput(BaseModel):
     CPU_Usage: float
     Memory_Usage: float
     RequestRate: float
     CPU_Limit: float
     Memory_Limit: float
+    
+app.get("/")
+def root():
+    return {"message": "Resource Usage Prediction API", "status": "running"}
+
+@app.get("/health")
+def health_check():
+    model_loaded = model is not None
+    scaler_loaded = scaler is not None
+    return {
+        "status": "healthy" if (model_loaded and scaler_loaded) else "unhealthy",
+        "model_loaded": model_loaded,
+        "scaler_loaded": scaler_loaded
+    }
 
 @app.post("/predict")
 def predict(input: UsageInput):
