@@ -65,6 +65,11 @@ class TrendLearner:
         }
         
     def partial_fit(self, X, y_cpu, y_mem):
-        X = self._apply_ema(X)
-        self.cpu_model.partial_fit(X, y_cpu)
-        self.mem_model.partial_fit(X, y_mem)
+        """Update model with new data point"""
+        if not self.is_fitted:
+            # If not fitted yet, use regular fit
+            self.train(X, y_cpu, y_mem)
+        else:
+            X_ema = self._apply_ema(X)
+            self.cpu_model.partial_fit(X_ema, y_cpu)
+            self.mem_model.partial_fit(X_ema, y_mem)
