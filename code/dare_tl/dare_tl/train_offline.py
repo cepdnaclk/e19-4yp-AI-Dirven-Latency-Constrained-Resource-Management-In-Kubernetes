@@ -14,7 +14,7 @@ y_mem = df["Memory_Usage_Delta"].values
 
 # Scale features
 scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+X_scaled = scaler.fit_transform(feature)
 
 # Save scaler for inference
 joblib.dump(scaler, "models/scaler.pkl")
