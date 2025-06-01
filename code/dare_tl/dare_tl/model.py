@@ -43,3 +43,8 @@ class TrendLearner:
             "cpu_range_m": (round(cpu_min), round(cpu_max)),
             "mem_range_mib": (round(mem_min), round(mem_max)),
         }
+        
+    def partial_fit(self, X, y_cpu, y_mem):
+        X = self._apply_ema(X)
+        self.cpu_model.partial_fit(X, y_cpu)
+        self.mem_model.partial_fit(X, y_mem)
