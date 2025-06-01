@@ -98,12 +98,16 @@ class EnhancedModelOptimizer:
                 "alpha": trial.suggest_float("sgd_alpha", 1e-6, 1e-1, log=True),
                 "eta0": trial.suggest_float("eta0", 1e-4, 0.1, log=True),
                 "penalty": trial.suggest_categorical("penalty", ["l2", "l1", "elasticnet"]),
-                "l1_ratio": trial.suggest_float("l1_ratio", 0.1, 0.9) if trial.suggest_categorical("penalty", ["l2", "l1", "elasticnet"]) == "elasticnet" else 0.15,
                 "learning_rate": trial.suggest_categorical("learning_rate", ["constant", "adaptive", "invscaling"]),
                 "max_iter": trial.suggest_int("max_iter", 1000, 5000),
                 "tol": trial.suggest_float("tol", 1e-5, 1e-2, log=True),
                 "random_state": 42
             }
+            
+            # Handle l1_ratio for elasticnet penalty
+            if sgd_params["penalty"] == "elasticnet":
+                sgd_params["l1_ratio"] = trial.suggest_float("l1_ratio", 0.1, 0.9)
+            
             cpu_params = mem_params = sgd_params
         
         # Random Forest parameters
@@ -153,6 +157,30 @@ class EnhancedModelOptimizer:
         if self.df is None:
             self.load_data()
         
+        # Clean up parameters - remove any RF-specific params that shouldn't be at top level
+        clean_params = {}
+        sgd_specific_params = ['sgd_alpha', 'eta0', 'penalty', 'learning_rate', 'max_iter', 'tol', 'l1_ratio']
+        rf_specific_params = ['n_estimators', 'max_depth', 'min_samples_split', 
+                             'min_samples_leaf', 'max_features']
+        
+        for key, value in best_params.items():
+            if key not in rf_specific_params:
+                clean_params[key] = value
+                
+        if clean_params.get('ensemble_method') == 'sgd':
+            sgd_params = {k.replace('sgd_', ''): v for k, v in best_params.items() if k in sgd_specific_params}
+            sgd_params.update({'random_state': 42})
+            clean_params['cpu_params'] = sgd_params.copy()
+            clean_params['mem_params'] = sgd_params.copy()
+
+        
+        # Ensure cpu_params and mem_params contain the RF parameters if using RF
+        if clean_params.get('ensemble_method') == 'rf':
+            rf_params = {k: v for k, v in best_params.items() if k in rf_specific_params}
+            rf_params.update({'random_state': 42, 'n_jobs': -1})
+            clean_params['cpu_params'] = rf_params.copy()
+            clean_params['mem_params'] = rf_params.copy()
+        
         # Prepare full dataset
         features = ["CPU_Usage", "Memory_Usage", "RequestRate", "CPU_Limit", "Memory_Limit"]
         X = self.df[features].values
@@ -170,7 +198,7 @@ class EnhancedModelOptimizer:
         y_mem_train, y_mem_val = y_mem[:split_idx], y_mem[split_idx:]
         
         # Train model
-        model = EnhancedTrendLearner(**best_params)
+        model = EnhancedTrendLearner(**clean_params)
         model.train(X_train, y_cpu_train, y_mem_train, 
                    validation_data=(X_val, y_cpu_val, y_mem_val))
         
