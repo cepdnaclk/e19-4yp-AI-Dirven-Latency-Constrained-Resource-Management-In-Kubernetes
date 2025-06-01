@@ -1,5 +1,5 @@
-from .preprocess import load_and_preprocess
-from .model import TrendLearner
+from preprocess import load_and_preprocess
+from model import TrendLearner
 import numpy as np
 
 df = load_and_preprocess("data/resource_usage.csv")
