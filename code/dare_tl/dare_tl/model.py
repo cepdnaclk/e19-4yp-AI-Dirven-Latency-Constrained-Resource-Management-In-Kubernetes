@@ -26,3 +26,6 @@ class TrendLearner:
     def predict_usage(self, X):
         X = self._apply_ema(X)
         return self.cpu_model.predict(X), self.mem_model.predict(X)
+    
+    def save(self, path):
+        dump(self, path)
