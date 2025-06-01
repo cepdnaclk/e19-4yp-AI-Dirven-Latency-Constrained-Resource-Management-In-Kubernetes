@@ -29,3 +29,7 @@ class TrendLearner:
     
     def save(self, path):
         dump(self, path)
+        
+    @staticmethod
+    def load(path):
+        return load(path)
