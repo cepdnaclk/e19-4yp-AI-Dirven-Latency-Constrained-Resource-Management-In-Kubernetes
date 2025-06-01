@@ -1,4 +1,4 @@
-from dare_tl.model import TrendLearner
+from .model import TrendLearner
 import numpy as np
 
 def update_model_online(model_path, new_data_point):

@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.linear_model import SGDRegressor
 from joblib import dump, load
+import sys
 
 class TrendLearner:
     def __init__(self, alpha=0.3):
@@ -32,6 +33,8 @@ class TrendLearner:
         
     @staticmethod
     def load(path):
+        import dare_tl.model as model_module
+        sys.modules['model'] = model_module  # spoof the module path
         return load(path)
     
     def safe_range(self, pred_cpu, pred_mem, cpu_margin=0.1, mem_margin=0.1):

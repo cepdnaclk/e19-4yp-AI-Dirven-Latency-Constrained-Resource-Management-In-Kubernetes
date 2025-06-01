@@ -4,6 +4,7 @@ import numpy as np
 import os
 
 df = load_and_preprocess("data/resource_usage.csv")
+df = add_ema_smoothing(df)
 
 features = df[[ "CPU Limit", "Memory Limit", "CPU Usage", "Memory Usage", "Request Rate"]].values
 y_cpu = df["CPU_Usage_Delta"].values

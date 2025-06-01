@@ -4,13 +4,13 @@ import numpy as np
 from dare_tl.model import TrendLearner
 
 app = FastAPI()
-MODEL_PATH = "models/tl_model.pkl"
+MODEL_PATH = "./models/tl_model.pkl"
 model = TrendLearner.load(MODEL_PATH)
 
 class UsageInput(BaseModel):
     CPU_Limit: float
     Memory_Limit: float
-     CPU_Usage: float
+    CPU_Usage: float
     Memory_Usage: float
     RequestRate: float
 
