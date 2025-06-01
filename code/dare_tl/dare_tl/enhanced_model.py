@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 class EnhancedTrendLearner:
     def __init__(self, 
                  alpha=0.3, 
+                 ema_alpha=None,
                  window_size=10,
                  cpu_params=None, 
                  mem_params=None,
@@ -27,7 +28,11 @@ class EnhancedTrendLearner:
         - Ensemble methods
         - Validation metrics
         """
-        self.alpha = alpha
+        # Handle both 'alpha' and 'ema_alpha' parameter names
+        if ema_alpha is not None:
+            self.alpha = ema_alpha
+        else:
+            self.alpha = alpha
         self.window_size = window_size
         self.ensemble_method = ensemble_method
         self.feature_engineering = feature_engineering
