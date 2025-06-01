@@ -44,18 +44,45 @@ def health_check():
 @app.post("/predict", response_model=PredictionResponse)
 def predict(input: UsageInput):
     
-    X = np.array([[input.CPU_Usage, input.Memory_Usage, input.RequestRate, input.CPU_Limit, input.Memory_Limit]])
-    X_scaled = scaler.transform(X)
-    pred_cpu_delta, pred_mem_delta = model.predict_usage(X_scaled)
-
-    future_cpu = input.CPU_Usage + (pred_cpu_delta[0] if pred_cpu_delta is not None else 0)
-    future_mem = max(0, input.Memory_Usage + (pred_mem_delta[0] if pred_mem_delta is not None else 0))
-    safe_range = model.safe_range(future_cpu, future_mem)
-
-    return {
-        "forecast": {
-            "CPU_Usage_Forecast": round(future_cpu, 2),
-            "Memory_Usage_Forecast": round(future_mem, 2)
-        },
-        "safe_range": safe_range
-    }
+    if model is None or scaler is None:
+        raise HTTPException(status_code=500, detail="Model or scaler not loaded")
+    
+    try:
+        # Prepare input data
+        X = np.array([[
+            input_data.CPU_Usage, 
+            input_data.Memory_Usage, 
+            input_data.RequestRate, 
+            input_data.CPU_Limit, 
+            input_data.Memory_Limit
+        ]])
+        
+        # Scale input features
+        X_scaled = scaler.transform(X)
+        
+        # Make predictions
+        pred_cpu_delta, pred_mem_delta = model.predict_usage(X_scaled)
+        
+        if pred_cpu_delta is None or pred_mem_delta is None:
+            raise HTTPException(status_code=500, detail="Model prediction failed")
+        
+        # Calculate future usage
+        future_cpu = input_data.CPU_Usage + pred_cpu_delta[0]
+        future_mem = max(0, input_data.Memory_Usage + pred_mem_delta[0])
+        
+        # Calculate safe operating range
+        safe_range = model.safe_range(future_cpu, future_mem)
+        
+        return PredictionResponse(
+            forecast={
+                "CPU_Usage_Forecast": round(future_cpu, 4),
+                "Memory_Usage_Forecast": round(future_mem, 0),
+                "CPU_Delta": round(pred_cpu_delta[0], 4),
+                "Memory_Delta": round(pred_mem_delta[0], 0)
+            },
+            safe_range=safe_range,
+            status="success"
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
