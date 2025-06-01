@@ -15,3 +15,10 @@ class TrendLearner:
         else:
             self.ema_feature = self.alpha * X + (1 - self.alpha) * self.ema_feature
         return self.ema_feature
+    
+    def train(self, X, y_cpu, y_mem):
+        for xi, y_cpu_i, y_mem_i in zip(X, y_cpu, y_mem):
+            xi = xi.reshape(1, -1)
+            xi_ema = self._apply_ema(xi)
+            self.cpu_model.partial_fit(xi_ema, [y_cpu_i])
+            self.mem_model.partial_fit(xi_ema, [y_mem_i])
