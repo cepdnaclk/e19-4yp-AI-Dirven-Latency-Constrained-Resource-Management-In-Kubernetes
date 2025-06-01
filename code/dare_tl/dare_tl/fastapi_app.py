@@ -1,11 +1,15 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import numpy as np
-from dare_tl.model import TrendLearner
+from model import TrendLearner
 import joblib
+import os
 
 app = FastAPI(title="Resource Usage Prediction API", version="1.0.0")
 # Load model and scaler
+# Model paths
+MODEL_PATH = "./models/tl_model.pkl"
+SCALER_PATH = "./models/scaler.pkl"
 try:
     model = TrendLearner.load(MODEL_PATH)
     scaler = joblib.load(SCALER_PATH)
@@ -50,11 +54,11 @@ def predict(input: UsageInput):
     try:
         # Prepare input data
         X = np.array([[
-            input_data.CPU_Usage, 
-            input_data.Memory_Usage, 
-            input_data.RequestRate, 
-            input_data.CPU_Limit, 
-            input_data.Memory_Limit
+            input.CPU_Usage, 
+            input.Memory_Usage, 
+            input.RequestRate, 
+            input.CPU_Limit, 
+            input.Memory_Limit
         ]])
         
         # Scale input features
@@ -67,8 +71,8 @@ def predict(input: UsageInput):
             raise HTTPException(status_code=500, detail="Model prediction failed")
         
         # Calculate future usage
-        future_cpu = input_data.CPU_Usage + pred_cpu_delta[0]
-        future_mem = max(0, input_data.Memory_Usage + pred_mem_delta[0])
+        future_cpu = input.CPU_Usage + pred_cpu_delta[0]
+        future_mem = max(0, input.Memory_Usage + pred_mem_delta[0])
         
         # Calculate safe operating range
         safe_range = model.safe_range(future_cpu, future_mem)

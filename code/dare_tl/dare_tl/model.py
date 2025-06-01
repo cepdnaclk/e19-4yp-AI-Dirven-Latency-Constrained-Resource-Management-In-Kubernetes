@@ -48,11 +48,6 @@ class TrendLearner:
     @staticmethod
     def load(path):
         """Load model from file"""
-        try:
-            import dare_tl.model as model_module
-            sys.modules['model'] = model_module  # spoof the module path
-        except ImportError:
-            pass  # Module might not exist in package structure
         return load(path)
     
     def safe_range(self, pred_cpu, pred_mem, cpu_margin=0.1, mem_margin=0.1):
@@ -61,8 +56,8 @@ class TrendLearner:
         mem_min = max(0, pred_mem * (1 - mem_margin))
         mem_max = pred_mem * (1 + mem_margin)
         return {
-            "cpu_range_m": (round(cpu_min), round(cpu_max)),
-            "mem_range_mib": (round(mem_min), round(mem_max)),
+            "cpu_range_m": (round(cpu_min, 4), round(cpu_max, 4)),
+            "mem_range_mib": (round(mem_min, 0), round(mem_max, 0)),
         }
         
     def partial_fit(self, X, y_cpu, y_mem):
