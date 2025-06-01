@@ -2,6 +2,8 @@ from preprocess import load_and_preprocess
 from model import TrendLearner
 import numpy as np
 import os
+from sklearn.preprocessing import StandardScaler
+import joblib
 
 df = load_and_preprocess("data/resource_usage.csv")
 
@@ -10,8 +12,15 @@ features = df[["CPU_Usage", "Memory_Usage", "RequestRate", "CPU_Limit", "Memory_
 y_cpu = df["CPU_Usage_Delta"].values
 y_mem = df["Memory_Usage_Delta"].values
 
+# Scale features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Save scaler for inference
+joblib.dump(scaler, "models/scaler.pkl")
+
 tl = TrendLearner()
-tl.train(features, y_cpu, y_mem)
+tl.train(X_scaled, y_cpu, y_mem)
 
 # Create models directory if it doesn't exist
 os.makedirs("models", exist_ok=True)
