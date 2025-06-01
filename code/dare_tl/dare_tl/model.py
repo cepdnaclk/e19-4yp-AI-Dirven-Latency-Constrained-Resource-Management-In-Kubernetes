@@ -32,8 +32,14 @@ class TrendLearner:
                 self.mem_model.partial_fit(xi_ema, [y_mem_i])
             
     def predict_usage(self, X):
+         """Predict CPU and memory usage deltas"""
+        if not self.is_fitted:
+            return None, None
+        
         X_ema = self._apply_ema(X)  # Or pass last_X if you have history
-        return self.cpu_model.predict(X_ema), self.mem_model.predict(X_ema)
+        cpu_pred = self.cpu_model.predict(X_ema)
+        mem_pred = self.mem_model.predict(X_ema)
+        return cpu_pred, mem_pred
     
     def save(self, path):
         dump(self, path)
