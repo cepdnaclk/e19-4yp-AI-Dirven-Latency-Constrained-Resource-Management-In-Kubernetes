@@ -6,7 +6,7 @@ import os
 df = load_and_preprocess("data/resource_usage.csv")
 
 
-features = df[[ "CPU Limit", "Memory Limit", "CPU Usage", "Memory Usage", "Request Rate"]].values
+features = df[["CPU_Usage", "Memory_Usage", "RequestRate", "CPU_Limit", "Memory_Limit"]].values
 y_cpu = df["CPU_Usage_Delta"].values
 y_mem = df["Memory_Usage_Delta"].values
 
