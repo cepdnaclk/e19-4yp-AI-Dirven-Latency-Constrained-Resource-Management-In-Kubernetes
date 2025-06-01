@@ -41,7 +41,7 @@ def health_check():
         "scaler_loaded": scaler_loaded
     }
 
-@app.post("/predict")
+@app.post("/predict", response_model=PredictionResponse)
 def predict(input: UsageInput):
     
     X = np.array([[input.CPU_Usage, input.Memory_Usage, input.RequestRate, input.CPU_Limit, input.Memory_Limit]])
