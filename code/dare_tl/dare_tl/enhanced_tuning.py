@@ -73,42 +73,27 @@ class EnhancedModelOptimizer:
     def _suggest_hyperparameters(self, trial) -> Dict[str, Any]:
         ema_alpha = trial.suggest_float("ema_alpha", 0.1, 0.9)
         window_size = trial.suggest_int("window_size", 5, 20)
-        ensemble_method = trial.suggest_categorical("ensemble_method", ["sgd", "rf"])
-        feature_engineering = trial.suggest_categorical("feature_engineering", [True, False])
+        # Force Random Forest only for now
+        ensemble_method = "rf"
+        feature_engineering = True
 
-        if ensemble_method == "sgd":
-            sgd_params = {
-                "alpha": trial.suggest_float("sgd_alpha", 1e-6, 1e-1, log=True),
-                "eta0": trial.suggest_float("eta0", 1e-4, 0.1, log=True),
-                "penalty": trial.suggest_categorical("penalty", ["l2", "l1", "elasticnet"]),
-                "learning_rate": trial.suggest_categorical("learning_rate", ["constant", "adaptive", "invscaling"]),
-                "max_iter": trial.suggest_int("max_iter", 1000, 5000),
-                "tol": trial.suggest_float("tol", 1e-5, 1e-2, log=True),
-                "random_state": 42
-            }
-            if sgd_params["penalty"] == "elasticnet":
-                sgd_params["l1_ratio"] = trial.suggest_float("l1_ratio", 0.1, 0.9)
-            cpu_params = mem_params = sgd_params
-
-        elif ensemble_method == "rf":
-            rf_params = {
-                "n_estimators": trial.suggest_int("n_estimators", 100, 300),
-                "max_depth": trial.suggest_int("max_depth", 10, 30),
-                "min_samples_split": trial.suggest_int("min_samples_split", 2, 10),
-                "min_samples_leaf": trial.suggest_int("min_samples_leaf", 1, 5),
-                "max_features": trial.suggest_categorical("max_features", ["sqrt", "log2", None]),
-                "random_state": 42,
-                "n_jobs": -1
-            }
-            cpu_params = mem_params = rf_params
+        rf_params = {
+            "n_estimators": trial.suggest_int("n_estimators", 100, 300),
+            "max_depth": trial.suggest_int("max_depth", 10, 30),
+            "min_samples_split": trial.suggest_int("min_samples_split", 2, 10),
+            "min_samples_leaf": trial.suggest_int("min_samples_leaf", 1, 5),
+            "max_features": trial.suggest_categorical("max_features", ["sqrt", "log2", None]),
+            "random_state": 42,
+            "n_jobs": -1
+        }
 
         return {
             "alpha": ema_alpha,
             "window_size": window_size,
             "ensemble_method": ensemble_method,
             "feature_engineering": feature_engineering,
-            "cpu_params": cpu_params,
-            "mem_params": mem_params
+            "cpu_params": rf_params,
+            "mem_params": rf_params
         }
 
     def optimize(self, n_trials: int = 100, study_name: str = "enhanced_trend_learner"):
@@ -133,25 +118,6 @@ class EnhancedModelOptimizer:
         if self.df is None:
             self.load_data()
 
-        sgd_specific_params = ['sgd_alpha', 'eta0', 'penalty', 'learning_rate', 'max_iter', 'tol', 'l1_ratio']
-        rf_specific_params = ['n_estimators', 'max_depth', 'min_samples_split', 'min_samples_leaf', 'max_features']
-        clean_params = {}
-        for key, value in best_params.items():
-            if key not in sgd_specific_params + rf_specific_params:
-                clean_params[key] = value
-
-        if clean_params.get('ensemble_method') == 'sgd':
-            sgd_params = {k.replace('sgd_', ''): v for k, v in best_params.items() if k in sgd_specific_params}
-            sgd_params.update({'random_state': 42})
-            clean_params['cpu_params'] = sgd_params.copy()
-            clean_params['mem_params'] = sgd_params.copy()
-
-        if clean_params.get('ensemble_method') == 'rf':
-            rf_params = {k: v for k, v in best_params.items() if k in rf_specific_params}
-            rf_params.update({'random_state': 42, 'n_jobs': -1})
-            clean_params['cpu_params'] = rf_params.copy()
-            clean_params['mem_params'] = rf_params.copy()
-
         features = ["CPU_Usage", "Memory_Usage", "RequestRate", "CPU_Limit", "Memory_Limit"]
         X = self.df[features].values
         y_cpu = self.df["CPU_Usage_Delta"].values
@@ -165,7 +131,19 @@ class EnhancedModelOptimizer:
         y_cpu_train, y_cpu_val = y_cpu[:split_idx], y_cpu[split_idx:]
         y_mem_train, y_mem_val = y_mem[:split_idx], y_mem[split_idx:]
 
+        #model = EnhancedTrendLearner(**best_params)
+        # Clean up best_params before passing to EnhancedTrendLearner
+        rf_specific_params = ['n_estimators', 'max_depth', 'min_samples_split', 'min_samples_leaf', 'max_features']
+        clean_params = {k: v for k, v in best_params.items() if k not in rf_specific_params}
+
+        if clean_params.get('ensemble_method') == 'rf':
+            rf_params = {k: v for k, v in best_params.items() if k in rf_specific_params}
+            rf_params.update({'random_state': 42, 'n_jobs': -1})
+            clean_params['cpu_params'] = rf_params
+            clean_params['mem_params'] = rf_params
+
         model = EnhancedTrendLearner(**clean_params)
+
         model.train(X_train, y_cpu_train, y_mem_train, validation_data=(X_val, y_cpu_val, y_mem_val))
 
         pred_cpu, pred_mem = model.predict_usage(X_val)

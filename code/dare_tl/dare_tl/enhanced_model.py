@@ -198,26 +198,29 @@ class EnhancedTrendLearner:
             logger.warning(f"Validation failed: {e}")
     
     def predict_usage(self, X):
-        """Enhanced prediction with confidence intervals"""
+        """Enhanced batch prediction"""
         if not self.is_fitted:
             return None, None
-        
+
         try:
-            # Engineer features for prediction
-            X_engineered = self._engineer_features(X)
-            
-            # Apply EMA
-            X_ema = self._apply_ema(X_engineered)
-            
-            # Make predictions
-            cpu_pred = self.cpu_model.predict(X_ema)
-            mem_pred = self.mem_model.predict(X_ema)
-            
-            return cpu_pred, mem_pred
-            
+            cpu_preds = []
+            mem_preds = []
+
+            for xi in X:
+                xi = xi.reshape(1, -1)
+                xi_engineered = self._engineer_features(xi)
+                xi_ema = self._apply_ema(xi_engineered)
+                cpu_pred = self.cpu_model.predict(xi_ema)[0]
+                mem_pred = self.mem_model.predict(xi_ema)[0]
+                cpu_preds.append(cpu_pred)
+                mem_preds.append(mem_pred)
+
+            return np.array(cpu_preds), np.array(mem_preds)
+
         except Exception as e:
             logger.error(f"Prediction failed: {e}")
             return None, None
+
     
     def predict_with_uncertainty(self, X, n_bootstrap=10):
         """Prediction with uncertainty estimation using bootstrap"""
