@@ -33,3 +33,13 @@ class TrendLearner:
     @staticmethod
     def load(path):
         return load(path)
+    
+    def safe_range(self, pred_cpu, pred_mem, cpu_margin=0.1, mem_margin=0.1):
+        cpu_min = max(0, pred_cpu * (1 - cpu_margin))
+        cpu_max = pred_cpu * (1 + cpu_margin)
+        mem_min = max(0, pred_mem * (1 - mem_margin))
+        mem_max = pred_mem * (1 + mem_margin)
+        return {
+            "cpu_range_m": (round(cpu_min), round(cpu_max)),
+            "mem_range_mib": (round(mem_min), round(mem_max)),
+        }
