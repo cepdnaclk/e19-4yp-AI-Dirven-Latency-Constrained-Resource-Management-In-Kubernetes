@@ -4,11 +4,16 @@ import numpy as np
 from dare_tl.model import TrendLearner
 import joblib
 
-app = FastAPI()
-MODEL_PATH = "./models/tl_model.pkl"
-SCALER_PATH = "models/scaler.pkl"
-model = TrendLearner.load(MODEL_PATH)
-scaler = joblib.load(SCALER_PATH)
+app = FastAPI(title="Resource Usage Prediction API", version="1.0.0")
+# Load model and scaler
+try:
+    model = TrendLearner.load(MODEL_PATH)
+    scaler = joblib.load(SCALER_PATH)
+    print("Model and scaler loaded successfully")
+except Exception as e:
+    print(f"Error loading model or scaler: {e}")
+    model = None
+    scaler = None
 
 class UsageInput(BaseModel):
     CPU_Usage: float
