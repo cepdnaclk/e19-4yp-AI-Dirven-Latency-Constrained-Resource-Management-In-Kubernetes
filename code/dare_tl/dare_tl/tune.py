@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
-from dare_tl.model import TrendLearner
-from dare_tl.preprocess import load_and_preprocess
+from model import TrendLearner
+from preprocess import load_and_preprocess
 import joblib
 
 def objective(trial):

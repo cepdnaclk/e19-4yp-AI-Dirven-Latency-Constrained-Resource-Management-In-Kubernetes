@@ -6,8 +6,8 @@ import sys
 class TrendLearner:
     def __init__(self, alpha=0.3, cpu_params=None, mem_params=None):
         self.alpha = alpha
-        self.cpu_model = SGDRegressor(**(max_iter=1000, tol=1e-3))
-        self.mem_model = SGDRegressor((**max_iter=1000, tol=1e-3))
+        self.cpu_model = SGDRegressor(**(cpu_params or {"max_iter": 1000, "tol": 1e-3}))
+        self.mem_model = SGDRegressor(**(mem_params or {"max_iter": 1000, "tol": 1e-3}))
         self.ema_feature = None  # For storing EMA of inputs
         self.is_fitted = False
         
