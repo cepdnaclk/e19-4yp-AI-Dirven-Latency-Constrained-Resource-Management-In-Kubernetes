@@ -9,6 +9,7 @@ class TrendLearner:
         self.mem_model = SGDRegressor(max_iter=1000, tol=1e-3)
         self.alpha = alpha
         self.ema_feature = None  # For storing EMA of inputs
+        self.is_fitted = False
         
     def _apply_ema(self, X):
         if self.ema_feature is None:
@@ -32,7 +33,7 @@ class TrendLearner:
                 self.mem_model.partial_fit(xi_ema, [y_mem_i])
             
     def predict_usage(self, X):
-         """Predict CPU and memory usage deltas"""
+        """Predict CPU and memory usage deltas"""
         if not self.is_fitted:
             return None, None
         
