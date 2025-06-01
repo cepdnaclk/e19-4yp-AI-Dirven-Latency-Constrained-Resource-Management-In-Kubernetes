@@ -1,4 +1,5 @@
 import numpy as np
+import pickle
 
 class OnlineLinearRegressor:
     def __init__(self, learning_rate=0.001):
