@@ -19,6 +19,10 @@ class PredictionResponse(BaseModel):
     forecast: dict
     safe_range: dict
     status: str
+    
+app.get("/")
+def root():
+    return {"message": "Resource Usage Prediction API", "status": "running"}
 
 class UsageInput(BaseModel):
     CPU_Usage: float
