@@ -14,6 +14,11 @@ except Exception as e:
     print(f"Error loading model or scaler: {e}")
     model = None
     scaler = None
+    
+class PredictionResponse(BaseModel):
+    forecast: dict
+    safe_range: dict
+    status: str
 
 class UsageInput(BaseModel):
     CPU_Usage: float
