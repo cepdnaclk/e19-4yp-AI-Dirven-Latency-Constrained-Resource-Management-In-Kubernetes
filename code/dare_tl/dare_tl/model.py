@@ -22,3 +22,7 @@ class TrendLearner:
             xi_ema = self._apply_ema(xi)
             self.cpu_model.partial_fit(xi_ema, [y_cpu_i])
             self.mem_model.partial_fit(xi_ema, [y_mem_i])
+            
+    def predict_usage(self, X):
+        X = self._apply_ema(X)
+        return self.cpu_model.predict(X), self.mem_model.predict(X)
