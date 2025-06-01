@@ -11,11 +11,9 @@ class TrendLearner:
         self.ema_feature = None  # For storing EMA of inputs
         
     def _apply_ema(self, X):
-        if self.ema_feature is None:
-            self.ema_feature = X.copy()
-        else:
-            self.ema_feature = self.alpha * X + (1 - self.alpha) * self.ema_feature
-        return self.ema_feature
+        if last_X is None:
+            return X
+        return self.alpha * X + (1 - self.alpha) * last_X
     
     def train(self, X, y_cpu, y_mem):
         for xi, y_cpu_i, y_mem_i in zip(X, y_cpu, y_mem):
