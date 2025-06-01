@@ -23,8 +23,8 @@ class TrendLearner:
             self.mem_model.partial_fit(xi_ema, [y_mem_i])
             
     def predict_usage(self, X):
-        X = self._apply_ema(X)
-        return self.cpu_model.predict(X), self.mem_model.predict(X)
+        X_ema = self._apply_ema(X)  # Or pass last_X if you have history
+        return self.cpu_model.predict(X_ema), self.mem_model.predict(X_ema)
     
     def save(self, path):
         dump(self, path)
