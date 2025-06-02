@@ -39,7 +39,7 @@ class TrendLearner:
         alpha_ema = trial.suggest_float("ema_alpha", 0.01, 0.9)
 
         learner = TrendLearner(alpha=alpha_ema, cpu_params=cpu_params, mem_params=mem_params)
-        learner.train(X_train, y_cpu_train, y_mem_train, tune=False)
+        learner.train(X_train, y_cpu_train, y_mem_train)
 
         cpu_pred, mem_pred = learner.predict_usage(X_val)
         cpu_loss = mean_squared_error(y_cpu_val, cpu_pred)
