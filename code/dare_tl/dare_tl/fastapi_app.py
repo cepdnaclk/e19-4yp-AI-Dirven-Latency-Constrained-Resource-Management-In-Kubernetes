@@ -21,6 +21,8 @@ except Exception as e:
     model = None
     scaler = None
     
+history_buffer = deque(maxlen=200)  # covers a bit more than 1 hour at ~30s intervals
+    
 class PredictionResponse(BaseModel):
     forecast: dict
     safe_range: dict
@@ -65,6 +67,10 @@ def predict(input: UsageInput):
         
         # Scale input features
         X_scaled = scaler.transform(X)
+        now = datetime.now()
+        
+        # Add new data to buffer
+        history_buffer.append((now, new_data_scaled[0]))
         
         # Make predictions
         pred_cpu_delta, pred_mem_delta = model.predict_usage(X_scaled)
