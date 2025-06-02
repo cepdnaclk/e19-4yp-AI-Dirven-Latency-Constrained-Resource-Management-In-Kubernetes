@@ -23,7 +23,7 @@ os.makedirs("models", exist_ok=True)
 joblib.dump(scaler, "models/scaler.pkl")
 
 tl = TrendLearner()
-tl.train(X_scaled, y_cpu, y_mem, tune=True)
+tl.train(X_scaled, y_cpu, y_mem)
 
 
 
