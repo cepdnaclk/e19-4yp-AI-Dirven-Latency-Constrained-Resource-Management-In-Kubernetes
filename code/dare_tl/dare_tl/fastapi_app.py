@@ -72,6 +72,13 @@ def predict(input: UsageInput):
         # Add new data to buffer
         history_buffer.append((now, new_data_scaled[0]))
         
+         # Filter last 1 hour of data
+        cutoff = now - timedelta(hours=1)
+        recent_data = np.array([x[1] for x in history_buffer if x[0] >= cutoff])
+
+        if recent_data.shape[0] == 0:
+            raise HTTPException(status_code=400, detail="Insufficient recent data for prediction")
+        
         # Make predictions
         pred_cpu_delta, pred_mem_delta = model.predict_usage(X_scaled)
         
