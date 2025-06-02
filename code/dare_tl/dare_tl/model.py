@@ -78,7 +78,7 @@ class TrendLearner:
                     return self._optuna_objective(trial, X_train, X_val, y_cpu_train, y_cpu_val, y_mem_train, y_mem_val)
 
                 study = optuna.create_study(direction="minimize")
-                study.optimize(objective, n_trials=n_trials, , callbacks=[self._early_stopping_callback()])
+                study.optimize(objective, n_trials=n_trials, callbacks=[self._early_stopping_callback()])
 
                 best_params = study.best_trial.params
 
