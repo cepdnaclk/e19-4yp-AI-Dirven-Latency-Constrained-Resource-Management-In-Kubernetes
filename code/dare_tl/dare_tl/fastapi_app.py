@@ -95,6 +95,19 @@ def predict(input: UsageInput):
         # Calculate safe operating range
         safe_range = model.safe_range(future_cpu, future_mem)
         
+        # ---- Online Model Update ----
+        if len(recent_data) >= 2:
+            # Get the previous actual usage
+            _, _, prev_cpu, prev_mem = recent_data[-2]
+
+            # Compute real deltas
+            y_cpu = np.array([input.CPU_Usage - prev_cpu])
+            y_mem = np.array([input.Memory_Usage - prev_mem])
+
+            # Train using current input and computed deltas
+            model.partial_fit(X_scaled, y_cpu, y_mem)
+            model.save(MODEL_PATH)
+        
         return PredictionResponse(
             forecast={
                 "CPU_Usage_Forecast": round(future_cpu, 4),
