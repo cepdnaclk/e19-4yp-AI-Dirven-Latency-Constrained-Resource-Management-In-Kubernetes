@@ -31,6 +31,9 @@ class UsageSnapshot(BaseModel):
     CPU_Limit: float
     Memory_Limit: float
     
+class UsageHistory(BaseModel):
+    records: list[UsageSnapshot]
+    
 app.get("/")
 def root():
     return {"message": "Resource Usage Prediction API", "status": "running"}
