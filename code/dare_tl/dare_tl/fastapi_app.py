@@ -4,6 +4,8 @@ import numpy as np
 from model import TrendLearner
 import joblib
 import os
+from datetime import datetime, timedelta
+from collections import deque
 
 app = FastAPI(title="Resource Usage Prediction API", version="1.0.0")
 # Load model and scaler
@@ -24,15 +26,12 @@ class PredictionResponse(BaseModel):
     safe_range: dict
     status: str
     
-class UsageSnapshot(BaseModel):
+class UsageInput(BaseModel):
     CPU_Usage: float
     Memory_Usage: float
     RequestRate: float
     CPU_Limit: float
     Memory_Limit: float
-    
-class UsageHistory(BaseModel):
-    records: list[UsageSnapshot]
     
 app.get("/")
 def root():
