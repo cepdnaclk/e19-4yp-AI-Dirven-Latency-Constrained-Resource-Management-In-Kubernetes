@@ -24,7 +24,7 @@ class PredictionResponse(BaseModel):
     safe_range: dict
     status: str
     
-class UsageInput(BaseModel):
+class UsageSnapshot(BaseModel):
     CPU_Usage: float
     Memory_Usage: float
     RequestRate: float
