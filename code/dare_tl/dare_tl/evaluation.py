@@ -10,7 +10,12 @@ model = TrendLearner.load(model_path)
 scaler = joblib.load(scaler_path)
 
 df = pd.read_csv("./data/resource_usage.csv")
-X_raw = df[["CPU_Usage", "Memory_Usage", "RequestRate", "CPU_Limit", "Memory_Limit"]].values
+X_raw = df[["CPU Usage", "Memory Usage", "Request Rate", "CPU Limit", "Memory Limit"]].values
+
+df["CPU_Usage_Delta"] = df["CPU Usage"].diff().fillna(0)
+df["Memory_Usage_Delta"] = df["Memory Usage"].diff().fillna(0)
+
+
 y_cpu = df["CPU_Usage_Delta"].values
 y_mem = df["Memory_Usage_Delta"].values
 
