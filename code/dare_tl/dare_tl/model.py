@@ -55,34 +55,34 @@ class TrendLearner:
         return self.ema_feature
 
     def train(self, X, y_cpu, y_mem):
-        if tune:
-            X_train, X_val, y_cpu_train, y_cpu_val, y_mem_train, y_mem_val = self._split_data(X, y_cpu, y_mem)
+        
+        X_train, X_val, y_cpu_train, y_cpu_val, y_mem_train, y_mem_val = self._split_data(X, y_cpu, y_mem)
 
-            def objective(trial):
-                return self._optuna_objective(trial, X_train, X_val, y_cpu_train, y_cpu_val, y_mem_train, y_mem_val)
+        def objective(trial):
+            return self._optuna_objective(trial, X_train, X_val, y_cpu_train, y_cpu_val, y_mem_train, y_mem_val)
 
-            study = optuna.create_study(direction="minimize")
-            study.optimize(objective, n_trials=n_trials)
+        study = optuna.create_study(direction="minimize")
+        study.optimize(objective, n_trials=100)
 
-            best_params = study.best_trial.params
+        best_params = study.best_trial.params
 
-            self.alpha = best_params["ema_alpha"]
-            self.cpu_params = {
-                "alpha": best_params["cpu_alpha"],
-                "max_iter": best_params["cpu_max_iter"],
-                "tol": best_params["cpu_tol"],
-                "eta0": best_params["cpu_eta0"],
-                "learning_rate": best_params["cpu_lr"],
-            }
-            self.mem_params = {
-                "alpha": best_params["mem_alpha"],
-                "max_iter": best_params["mem_max_iter"],
-                "tol": best_params["mem_tol"],
-                "eta0": best_params["mem_eta0"],
-                "learning_rate": best_params["mem_lr"],
-            }
-            self.cpu_model = SGDRegressor(**self.cpu_params)
-            self.mem_model = SGDRegressor(**self.mem_params)
+        self.alpha = best_params["ema_alpha"]
+        self.cpu_params = {
+            "alpha": best_params["cpu_alpha"],
+            "max_iter": best_params["cpu_max_iter"],
+            "tol": best_params["cpu_tol"],
+            "eta0": best_params["cpu_eta0"],
+            "learning_rate": best_params["cpu_lr"],
+        }
+        self.mem_params = {
+            "alpha": best_params["mem_alpha"],
+            "max_iter": best_params["mem_max_iter"],
+            "tol": best_params["mem_tol"],
+            "eta0": best_params["mem_eta0"],
+            "learning_rate": best_params["mem_lr"],
+        }
+        self.cpu_model = SGDRegressor(**self.cpu_params)
+        self.mem_model = SGDRegressor(**self.mem_params)
         
         
         for xi, y_cpu_i, y_mem_i in zip(X, y_cpu, y_mem):
