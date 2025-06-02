@@ -1,7 +1,9 @@
 import numpy as np
 from sklearn.linear_model import SGDRegressor
+from sklearn.metrics import mean_squared_error
 from joblib import dump, load
 import sys
+import optuna
 
 class TrendLearner:
     def __init__(self, alpha=0.3, cpu_params=None, mem_params=None):
@@ -10,6 +12,14 @@ class TrendLearner:
         self.mem_model = SGDRegressor(**(mem_params or {"max_iter": 1000, "tol": 1e-3}))
         self.ema_feature = None  # For storing EMA of inputs
         self.is_fitted = False
+        
+    def _split_data(self, X, y_cpu, y_mem, ratio=0.8):
+        split_idx = int(len(X) * ratio)
+        return (
+            X[:split_idx], X[split_idx:],
+            y_cpu[:split_idx], y_cpu[split_idx:],
+            y_mem[:split_idx], y_mem[split_idx:]
+        )
         
     def _apply_ema(self, X):
         if self.ema_feature is None:
