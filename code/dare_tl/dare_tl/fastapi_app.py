@@ -70,7 +70,7 @@ def predict(input: UsageInput):
         now = datetime.now()
         
         # Add new data to buffer
-        history_buffer.append((now, new_data_scaled[0]))
+        history_buffer.append((now, X_scaled[0]))
         
          # Filter last 1 hour of data
         cutoff = now - timedelta(hours=1)
@@ -83,7 +83,7 @@ def predict(input: UsageInput):
         input_for_prediction = recent_data.mean(axis=0).reshape(1, -1)
         
         # Make predictions
-        pred_cpu_delta, pred_mem_delta = model.predict_usage(X_scaled)
+        pred_cpu_delta, pred_mem_delta = model.predict_usage(input_for_prediction)
         
         if pred_cpu_delta is None or pred_mem_delta is None:
             raise HTTPException(status_code=500, detail="Model prediction failed")
