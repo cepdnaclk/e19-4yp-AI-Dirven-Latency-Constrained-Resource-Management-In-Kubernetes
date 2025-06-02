@@ -127,3 +127,4 @@ class EnhancedTrendLearner:
             'cpu_importance': dict(zip(feature_names, self.cpu_model.feature_importances_)),
             'mem_importance': dict(zip(feature_names, self.mem_model.feature_importances_))
         }
+
