@@ -79,6 +79,9 @@ def predict(input: UsageInput):
         if recent_data.shape[0] == 0:
             raise HTTPException(status_code=400, detail="Insufficient recent data for prediction")
         
+        # Use the average of recent features as input to the model
+        input_for_prediction = recent_data.mean(axis=0).reshape(1, -1)
+        
         # Make predictions
         pred_cpu_delta, pred_mem_delta = model.predict_usage(X_scaled)
         
