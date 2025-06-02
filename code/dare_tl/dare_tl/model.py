@@ -21,6 +21,32 @@ class TrendLearner:
             y_mem[:split_idx], y_mem[split_idx:]
         )
         
+    def _optuna_objective(self, trial, X_train, X_val, y_cpu_train, y_cpu_val, y_mem_train, y_mem_val):
+        cpu_params = {
+            "alpha": trial.suggest_loguniform("cpu_alpha", 1e-6, 1e-1),
+            "max_iter": trial.suggest_int("cpu_max_iter", 500, 2000),
+            "tol": trial.suggest_float("cpu_tol", 1e-4, 1e-2),
+            "eta0": trial.suggest_loguniform("cpu_eta0", 1e-4, 1e-1),
+            "learning_rate": trial.suggest_categorical("cpu_lr", ["constant", "optimal", "invscaling", "adaptive"]),
+        }
+        mem_params = {
+            "alpha": trial.suggest_loguniform("mem_alpha", 1e-6, 1e-1),
+            "max_iter": trial.suggest_int("mem_max_iter", 500, 2000),
+            "tol": trial.suggest_float("mem_tol", 1e-4, 1e-2),
+            "eta0": trial.suggest_loguniform("mem_eta0", 1e-4, 1e-1),
+            "learning_rate": trial.suggest_categorical("mem_lr", ["constant", "optimal", "invscaling", "adaptive"]),
+        }
+        alpha_ema = trial.suggest_float("ema_alpha", 0.01, 0.9)
+
+        learner = TrendLearner(alpha=alpha_ema, cpu_params=cpu_params, mem_params=mem_params)
+        learner.train(X_train, y_cpu_train, y_mem_train, tune=False)
+
+        cpu_pred, mem_pred = learner.predict_usage(X_val)
+        cpu_loss = mean_squared_error(y_cpu_val, cpu_pred)
+        mem_loss = mean_squared_error(y_mem_val, mem_pred)
+
+        return cpu_loss + mem_loss
+        
     def _apply_ema(self, X):
         if self.ema_feature is None:
             self.ema_feature = X.copy()
