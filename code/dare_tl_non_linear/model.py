@@ -3,7 +3,9 @@ from joblib import dump, load
 
 # Optional import (River is required for advanced models)
 try:
-    from river import linear_model, ensemble, preprocessing, metrics, compose
+    from river import linear_model, preprocessing, metrics, compose
+    #from river.ensemble import AdaptiveRandomForestRegressor
+    from river.tree import HoeffdingTreeRegressor
     RIVER_AVAILABLE = True
 except ImportError:
     RIVER_AVAILABLE = False
@@ -37,9 +39,10 @@ class TrendLearner:
         elif self.backend == "river_forest":
             if not RIVER_AVAILABLE:
                 raise ImportError("River is not installed. Install it via 'pip install river'")
-
-            self.cpu_model = ensemble.AdaptiveRandomForestRegressor(seed=42)
-            self.mem_model = ensemble.AdaptiveRandomForestRegressor(seed=42)
+            self.cpu_model = HoeffdingTreeRegressor()
+            self.mem_model = HoeffdingTreeRegressor()
+            #self.cpu_model = ensemble.AdaptiveRandomForestRegressor(model=tree.HoeffdingTreeRegressor(),seed=42)
+            #self.mem_model = ensemble.AdaptiveRandomForestRegressor(model=tree.HoeffdingTreeRegressor(),seed=42)
         else:
             raise ValueError(f"Unsupported backend: {self.backend}")
 

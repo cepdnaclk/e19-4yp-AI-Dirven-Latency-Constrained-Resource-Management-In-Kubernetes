@@ -1,0 +1,8 @@
+scikit-learn
+pandas
+numpy
+matplotlib
+joblib
+optuna
+river
+streamlit
