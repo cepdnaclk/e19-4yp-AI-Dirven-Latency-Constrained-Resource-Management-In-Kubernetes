@@ -1,0 +1,42 @@
+from __future__ import annotations
+
+from river import metrics, utils
+from river.metrics.multioutput.base import MultiOutputMetric
+
+__all__ = ["MicroAverage"]
+
+
+class MicroAverage(MultiOutputMetric, metrics.base.WrapperMetric):
+    """Micro-average wrapper.
+
+    The provided metric is updated with the value of each output.
+
+    Parameters
+    ----------
+    metric
+        A classification or a regression metric.
+
+    """
+
+    def __init__(self, metric):
+        self._metric = metric
+
+    @property
+    def metric(self):
+        return self._metric
+
+    def works_with(self, model) -> bool:
+        if isinstance(self.metric, metrics.base.ClassificationMetric):
+            return utils.inspect.ismoclassifier(model)
+        return utils.inspect.ismoregressor(model)
+
+    def update(self, y_true, y_pred, w=1.0):
+        for i in y_true:
+            self.metric.update(y_true[i], y_pred[i], w)
+
+    def revert(self, y_true, y_pred, w=1.0):
+        for i in y_true:
+            self.metric.revert(y_true[i], y_pred[i], w)
+
+    def get(self):
+        return self.metric.get()
