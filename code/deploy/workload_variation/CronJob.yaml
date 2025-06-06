@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: prime-load-up
+  namespace: default
+spec:
+  schedule: "*/10 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: workload-up
+              image: curlimages/curl:latest
+              command: ["/bin/sh", "/scripts/generate_prime_load.sh", "up"]
+              volumeMounts:
+                - name: script-vol
+                  mountPath: /scripts
+          restartPolicy: OnFailure
+          volumes:
+            - name: script-vol
+              configMap:
+                name: prime-load-generator-script
+                defaultMode: 0755
