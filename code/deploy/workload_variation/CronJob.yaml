@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: wave-load-simulator
+  namespace: default
+spec:
+  schedule: "*/5 * * * *"  # Every 5 minutes
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: simulate-load
+              image: polinux/stress  # contains stress-ng
+              command: ["/bin/bash", "/scripts/load_wave.sh"]
+              volumeMounts:
+                - name: script-volume
+                  mountPath: /scripts
+                - name: state-volume
+                  mountPath: /data
+          restartPolicy: OnFailure
+          volumes:
+            - name: script-volume
+              configMap:
+                name: workload-controller-script
+                defaultMode: 0755
+            - name: state-volume
+              persistentVolumeClaim:
+                claimName: workload-pvc
