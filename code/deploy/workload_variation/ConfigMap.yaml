@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prime-load-generator-script
+  namespace: default
+data:
+  generate_prime_load.sh: |
+    #!/bin/bash
+    <insert script content above here>

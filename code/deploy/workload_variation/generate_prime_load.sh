@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SERVICE_URL="http://your-service.default.svc.cluster.local:8080/isPrime"
+SERVICE_URL="http://service-1-service.default.svc.cluster.local:3001/isPrime"
 PHASE=$1 # "up" or "down"
 STEPS=(10 20 30 40 50 100 150 200 250 300 350 400 450 500 600 700 800 900 1000)
 
