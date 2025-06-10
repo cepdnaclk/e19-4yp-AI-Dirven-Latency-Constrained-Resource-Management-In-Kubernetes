@@ -8,43 +8,25 @@ data:
     #!/bin/bash
 
     SERVICE_URL="http://service-1-service:3001/isPrime"
+    DURATION=600  # 10 minutes
 
+    # Pick a random requests per second (RPS) between 1 and 10
+    RPS=$(( RANDOM % 10 + 1 ))
+    SLEEP_TIME=$(echo "scale=3; 1 / $RPS" | bc)
 
-    DURATION=600  # 10 minutes in seconds
+    # Pick a random number range for the requests (optional)
+    START_NUM=$(( RANDOM % 20000 + 10000 ))
+    END_NUM=$(( START_NUM + 10000 ))
 
-    # Function to generate random primes workload
-    generate_load() {
-      end=$((SECONDS + DURATION))
-      echo "Starting load generation for 10 minutes..."
-      while [ $SECONDS -lt $end ]; do
-        # Generate a random number between 10,000 and 20,000
-        NUM=$(( RANDOM % 10000 + 10000 ))
-        # Call the prime check endpoint
-        curl -s "${SERVICE_URL}?number=${NUM}" > /dev/null
-        sleep 0.2  # 5 requests per second approx
-      done
-      echo "Load generation period finished."
-    }
+    echo "Generating load at $RPS requests/second for 10 minutes..."
+    echo "Number range: $START_NUM to $END_NUM"
 
-    # Run load twice, with different number ranges (simulate workload variation)
-    echo "Generating first load phase..."
-    generate_load
-
-    echo "Waiting 10 seconds before second load phase..."
-    sleep 10
-
-    echo "Generating second load phase..."
-    # Adjust random number range to generate different load
-    generate_load() {
-      end=$((SECONDS + DURATION))
-      echo "Starting second load generation for 10 minutes..."
-      while [ $SECONDS -lt $end ]; do
-        NUM=$(( RANDOM % 10000 + 20000 ))
-        curl -s "${SERVICE_URL}?number=${NUM}" > /dev/null
-        sleep 0.2
-      done
-      echo "Second load generation finished."
-    }
-    generate_load
+    end=$((SECONDS + DURATION))
+    while [ $SECONDS -lt $end ]; do
+      NUM=$(( RANDOM % (END_NUM - START_NUM) + START_NUM ))
+      curl -s "${SERVICE_URL}?number=${NUM}" > /dev/null
+      sleep $SLEEP_TIME
+    done
 
     echo "Load generation complete."
+

@@ -13,7 +13,7 @@ spec:
         spec:
           containers:
           - name: load-generator
-            image: curlimages/curl:7.85.0  # lightweight curl image
+            image: bash:5.1   # lightweight curl image
             command: ["/bin/bash", "/scripts/generate_load.sh"]
             volumeMounts:
               - name: script-volume
