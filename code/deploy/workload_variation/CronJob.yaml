@@ -1,26 +1,33 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: prime-load-cronjob
+  name: prime-load-generator
   namespace: default
 spec:
-  schedule: "0 */3 * * *" # every 3 hours
-  successfulJobsHistoryLimit: 6
-  failedJobsHistoryLimit: 6
+  schedule: "*/20 * * * *"  # every 20 minutes (to run two load phases)
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-            - name: prime-load
-              image: curlimages/curl:latest
-              command: ["/bin/sh", "/scripts/load_generator.sh"]
-              volumeMounts:
-                - name: script-volume
-                  mountPath: /scripts
+          - name: load-generator
+            image: curlimages/curl:7.85.0  # lightweight curl image
+            command: ["/bin/bash", "/scripts/generate_load.sh"]
+            volumeMounts:
+              - name: script-volume
+                mountPath: /scripts
+            resources:
+              requests:
+                cpu: "100m"
+                memory: "128Mi"
+              limits:
+                cpu: "200m"
+                memory: "256Mi"
           restartPolicy: OnFailure
           volumes:
             - name: script-volume
               configMap:
-                name: prime-load-script
+                name: prime-load-generator-script
                 defaultMode: 0755
