@@ -4,7 +4,7 @@ metadata:
   name: prime-load-generator
   namespace: default
 spec:
-  schedule: "*/20 * * * *"  # every 20 minutes (to run two load phases)
+  schedule: "*/10 * * * *"  # every 10 minutes
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
   jobTemplate:
