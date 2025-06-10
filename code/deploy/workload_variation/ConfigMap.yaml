@@ -14,7 +14,7 @@ data:
     RPS=$(( RANDOM % 10 + 1 ))
     SLEEP_TIME=$(echo "scale=3; 1 / $RPS" | bc)
 
-    # Pick a random number range for the requests (optional)
+    # Pick a random number range for the requests
     START_NUM=$(( RANDOM % 20000 + 10000 ))
     END_NUM=$(( START_NUM + 10000 ))
 
@@ -29,4 +29,3 @@ data:
     done
 
     echo "Load generation complete."
-
