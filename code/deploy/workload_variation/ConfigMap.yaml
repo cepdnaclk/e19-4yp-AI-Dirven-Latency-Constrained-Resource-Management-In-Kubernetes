@@ -7,6 +7,12 @@ data:
   generate_load.sh: |
     #!/bin/bash
 
+    # Install curl if missing
+    if ! command -v curl &> /dev/null; then
+      echo "curl not found, installing..."
+      apt-get update && apt-get install -y curl
+    fi
+
     SERVICE_URL="http://service-1-service:3001/isPrime"
     DURATION=600  # 10 minutes
 
