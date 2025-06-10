@@ -4,15 +4,40 @@ metadata:
   name: prime-load-up
   namespace: default
 spec:
-  schedule: "*/10 * * * *"
+  schedule: "*/10 * * * *"  # Every 10 mins: 0, 10, 20, ...
   jobTemplate:
     spec:
       template:
         spec:
           containers:
             - name: workload-up
-              image: curlimages/curl:latest
-              command: ["/bin/sh", "/scripts/generate_prime_load.sh", "up"]
+              image: bash:latest
+              command: ["/bin/bash", "/scripts/generate_prime_load.sh", "up"]
+              volumeMounts:
+                - name: script-vol
+                  mountPath: /scripts
+          restartPolicy: OnFailure
+          volumes:
+            - name: script-vol
+              configMap:
+                name: prime-load-generator-script
+                defaultMode: 0755
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: prime-load-down
+  namespace: default
+spec:
+  schedule: "5-59/10 * * * *"  # Every 10 mins offset by 5: 5, 15, 25, ...
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: workload-down
+              image: bash:latest
+              command: ["/bin/bash", "/scripts/generate_prime_load.sh", "down"]
               volumeMounts:
                 - name: script-vol
                   mountPath: /scripts
