@@ -67,7 +67,15 @@ def get_container_memory_limit(pod):
     return result[0]['value'][1]
 
 def get_request_rate_java(pod):
-    query = f'sum(rate(http_server_requests_seconds_count{{pod=~"{pod}"}}[1m]))'
+    query = (
+        f'sum(rate(http_server_requests_seconds_count{{'
+        f'namespace="default", '
+        f'app="service-1", '
+        f'pod=~"{pod}", '
+        f'outcome="SUCCESS", '
+        f'status=~"2.."'
+        f'}}[5m]))'
+    )
     result = query_prometheus(query)
     return float(result[0]['value'][1]) if result else 0
 
