@@ -13,6 +13,12 @@ data:
       apt-get update && apt-get install -y curl
     fi
 
+    if ! command -v bc &> /dev/null; then
+      echo "bc not found, installing..."
+      apt-get update && apt-get install -y bc
+    fi
+
+
     SERVICE_URL="http://service-1-service:3001/isPrime"
     DURATION=600  # 10 minutes
 
