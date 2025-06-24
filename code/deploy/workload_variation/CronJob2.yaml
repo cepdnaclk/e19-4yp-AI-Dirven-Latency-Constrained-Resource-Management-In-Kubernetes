@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: prime-load-generator
+  namespace: default
+spec:
+  schedule: "*/10 * * * *"  # every 10 minutes
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: load-generator
+            image: debian:bullseye-slim  # lightweight curl image
+            command: ["/bin/bash", "/scripts/generate_load_2.sh"]
+            volumeMounts:
+              - name: script-volume
+                mountPath: /scripts
+            resources:
+              requests:
+                cpu: "100m"
+                memory: "128Mi"
+              limits:
+                cpu: "200m"
+                memory: "256Mi"
+          restartPolicy: OnFailure
+          volumes:
+            - name: script-volume
+              configMap:
+                name: prime-load-generator-script
+                defaultMode: 0755
