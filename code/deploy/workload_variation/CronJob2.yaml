@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: prime-load-generator
+  name: prime-load-generator-2
   namespace: default
 spec:
   schedule: "*/10 * * * *"  # every 10 minutes
@@ -12,7 +12,7 @@ spec:
       template:
         spec:
           containers:
-          - name: load-generator
+          - name: load-generator-2
             image: debian:bullseye-slim  # lightweight curl image
             command: ["/bin/bash", "/scripts/generate_load_2.sh"]
             volumeMounts:
@@ -29,5 +29,5 @@ spec:
           volumes:
             - name: script-volume
               configMap:
-                name: prime-load-generator-script
+                name: prime-load-generator-2-script
                 defaultMode: 0755

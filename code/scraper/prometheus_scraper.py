@@ -80,7 +80,7 @@ def get_request_rate_java(pod):
     return float(result[0]['value'][1]) if result else 0
 
 def get_request_rate_go(pod):
-    query = f'sum(rate(echo_number_request_duration_seconds_count{{pod=~"{pod}"}}[1m]))'
+    query = f'sum(rate(echo_number_request_duration_seconds_count{{pod=~"{pod}"}}[5m]))'
     result = query_prometheus(query)
     return float(result[0]['value'][1]) if result else 0
 
