@@ -40,7 +40,9 @@ func main() {
 	http.HandleFunc("/echoNumber", echoNumberHandler)
 	http.Handle("/metrics", promhttp.Handler())
 	log.Println("🚀 Server started on port 3002")
-	http.ListenAndServe(":3002", nil)
+	if err := http.ListenAndServe(":3002", nil); err != nil {
+        log.Fatalf("❌ Failed to start server: %v", err)
+    }
 }
 
 func echoNumberHandler(w http.ResponseWriter, r *http.Request) {
