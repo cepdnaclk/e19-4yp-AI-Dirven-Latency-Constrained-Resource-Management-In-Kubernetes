@@ -20,9 +20,10 @@ WORKDIR /root/
 
 # Copy the binary from builder
 COPY --from=builder /app/echo-server .
+RUN chmod +x echo-server
 
 # Expose the service port
 EXPOSE 3002
 
 # Run the binary
-CMD ["./main"]
+CMD ["./echo-server"]
