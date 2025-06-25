@@ -111,3 +111,17 @@ class TrendLearner:
             "cpu_range_m": (round(max(0, pred_cpu * (1 - cpu_margin)), 4), round(pred_cpu * (1 + cpu_margin), 4)),
             "mem_range_mib": (round(max(0, pred_mem * (1 - mem_margin)), 0), round(pred_mem * (1 + mem_margin), 0))
         }
+
+
+
+
+# EMA-enhanced regression
+self.ema_feature = self.alpha * X + (1 - self.alpha) * self.ema_feature
+
+# River integration
+x_dict = {f"f{i}": xi_ema[0][i] for i in range(xi_ema.shape[1])}
+self.cpu_model.learn_one(x_dict, y_cpu_i)
+
+
+
+

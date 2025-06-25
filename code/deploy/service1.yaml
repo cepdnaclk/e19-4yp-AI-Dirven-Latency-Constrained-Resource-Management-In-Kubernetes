@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: service-1-container
-          image: service-1-image:latest
+          image: wishula/prime-service:latest
           imagePullPolicy: Never
           ports:
             - containerPort: 3001
