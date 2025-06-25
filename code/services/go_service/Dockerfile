@@ -25,4 +25,4 @@ COPY --from=builder /app/echo-server .
 EXPOSE 3002
 
 # Run the binary
-CMD ["./echo-server"]
+CMD ["./main"]
