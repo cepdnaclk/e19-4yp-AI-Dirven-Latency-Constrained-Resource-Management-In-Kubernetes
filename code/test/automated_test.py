@@ -54,8 +54,8 @@ def run_jmx_test(jmx_path):
                 [
                     JMETER_PATH, "-n",
                     "-t", jmx_abs_path,
-                    "-l", results_path,
-                    "-e", "-o", report_dir
+                    "-l", results_path
+                    # "-e", "-o", report_dir
                 ],
                 stdout=log_file,
                 stderr=log_file,
@@ -66,7 +66,8 @@ def run_jmx_test(jmx_path):
             log_file.write(f"[{datetime.now()}] Finished with exit code {process.returncode}\n")
             log_file.flush()
 
-            print(f"Test completed. Results saved to {results_path} and HTML report generated in {report_dir}/")
+            print(f"Test completed. Results saved to {results_path}")
+            # print(f"Test completed. Results saved to {results_path} and HTML report generated in {report_dir}/")
 
         time.sleep(5)
 
