@@ -104,10 +104,11 @@ async def push_loop():
                 "CPU Throttling": cpu_throttling,
                 "Memory Working Set": mem_working_set
             }
+
             if connected_clients:
                 await asyncio.gather(*(ws.send(json.dumps(data)) for ws in connected_clients))
 
-        await asyncio.sleep(1)
+        await asyncio.sleep(5)
 
 async def main():
     print("WebSocket server listening at ws://0.0.0.0:8765")
