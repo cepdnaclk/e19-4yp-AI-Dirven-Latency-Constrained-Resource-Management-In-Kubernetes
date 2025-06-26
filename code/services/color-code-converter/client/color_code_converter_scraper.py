@@ -104,7 +104,7 @@ async def push_loop():
                 "CPU Throttling": cpu_throttling,
                 "Memory Working Set": mem_working_set
             }
-
+            print(1)
             if connected_clients:
                 await asyncio.gather(*(ws.send(json.dumps(data)) for ws in connected_clients))
 
