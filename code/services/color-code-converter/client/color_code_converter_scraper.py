@@ -27,7 +27,7 @@ def query_prometheus(query):
         raise Exception(f"Query failed: {response.status_code} {response.text}")
 
 def get_container_cpu_usage(pod):
-    return query_prometheus(f'sum(rate(container_cpu_usage_seconds_total{{pod=~"{pod}"}}[1h]))')
+    return query_prometheus(f'sum(rate(container_cpu_usage_seconds_total{{pod=~"{pod}"}}[1m]))')
 
 def get_container_memory_usage_bytes(pod):
     return query_prometheus(f'container_memory_usage_bytes{{pod=~"{pod}"}}')
