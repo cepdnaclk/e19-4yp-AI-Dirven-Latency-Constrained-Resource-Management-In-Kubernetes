@@ -50,8 +50,8 @@ def get_container_memory_limit(pod):
 
 def get_latency_java(pod):
     result = query_prometheus(
-        f'sum(rate(http_server_requests_seconds_sum{{pod=~"{pod}"}}[1h])) '
-        f'/ sum(rate(http_server_requests_seconds_count{{pod=~"{pod}", outcome="SUCCESS"}}[1h]))'
+        f'sum(rate(http_server_requests_seconds_sum{{pod=~"{pod}"}}[1m])) '
+        f'/ sum(rate(http_server_requests_seconds_count{{pod=~"{pod}", outcome="SUCCESS"}}[1m]))'
     )
     return float(result[0]['value'][1]) if result else 0
 
@@ -108,7 +108,7 @@ async def push_loop():
             if connected_clients:
                 await asyncio.gather(*(ws.send(json.dumps(data)) for ws in connected_clients))
 
-        await asyncio.sleep(5)
+        await asyncio.sleep(0.5)
 
 async def main():
     print("WebSocket server listening at ws://0.0.0.0:8765")
