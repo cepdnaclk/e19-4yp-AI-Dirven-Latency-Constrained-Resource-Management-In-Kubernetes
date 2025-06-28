@@ -30,7 +30,7 @@ def run_locust_fluctuating_workload():
 
         command = (
             f"locust -f locustfile.py --headless -u {user_count} -r 3 "
-            f"--run-time 60s --host=http://192.168.49.104:3015"
+            f"--run-time 60s --host=http://127.0.0.1:3015"
         )
         os.system(command)
 
