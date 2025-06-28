@@ -1,28 +1,23 @@
-# Use official Golang image as builder
-FROM golang:1.24.2 AS builder
+# Stage 1: Builder
+FROM golang:1.24.2 as builder
 
 WORKDIR /app
-
-# Copy and download dependencies
 COPY go.mod go.sum ./
 RUN go mod download
-
-# Copy source code
 COPY . .
 
-# Build the Go app
-RUN go build -o echo-server .
+# ✨ Cross-compile for Linux
+RUN GOOS=linux GOARCH=amd64 go build -o echo-server main.go
 
-# Use a minimal image for runtime
+# Stage 2: Minimal runtime image
 FROM alpine:latest
 
-WORKDIR /root/
+# Ensure certs for HTTPS requests (optional for Prometheus metrics)
+RUN apk --no-cache add ca-certificates
 
-# Copy the binary from builder
+WORKDIR /root/
 COPY --from=builder /app/echo-server .
 
-# Expose the service port
 EXPOSE 3002
 
-# Run the binary
 CMD ["./echo-server"]

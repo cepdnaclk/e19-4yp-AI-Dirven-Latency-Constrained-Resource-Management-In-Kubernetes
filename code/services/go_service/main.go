@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-
+	"log"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -39,7 +39,10 @@ func init() {
 func main() {
 	http.HandleFunc("/echoNumber", echoNumberHandler)
 	http.Handle("/metrics", promhttp.Handler())
-	http.ListenAndServe(":3002", nil)
+	log.Println("🚀 Server started on port 3002")
+	if err := http.ListenAndServe(":3002", nil); err != nil {
+        log.Fatalf("❌ Failed to start server: %v", err)
+    }
 }
 
 func echoNumberHandler(w http.ResponseWriter, r *http.Request) {

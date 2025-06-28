@@ -23,8 +23,8 @@ data:
     DURATION=600  # 10 minutes
 
     # Pick a random requests per second (RPS) between 1 and 10
-    RPS=$(( RANDOM % 10000 + 1 ))
-    SLEEP_TIME=$(echo "scale=3; 1 / $RPS" | bc)
+    RPS=$(( RANDOM % 10000 + 500 ))
+    SLEEP_TIME=$(echo "scale=4; 1 / $RPS" | bc)
 
     # Pick a random number range for the requests
     START_NUM=$(( RANDOM % 20000 + 10000 ))
