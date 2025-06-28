@@ -42,7 +42,7 @@ You can run the script in the background using `nohup` to ensure it keeps runnin
 ### Basic Run (foreground)
 
 ```bash
-python3 prometheus_scraper.py
+0
 ```
 
 ### Run in Background with `nohup`
