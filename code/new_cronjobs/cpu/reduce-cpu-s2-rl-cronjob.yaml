@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: reduce-cpu-s1-rl-cronjob
+  name: reduce-cpu-s2-rl-cronjob
   namespace: default
 spec:
   schedule: "0 */3 * * *"
@@ -14,7 +14,7 @@ spec:
           containers:
             - name: reduce-cpu
               image: bitnami/kubectl:latest
-              command: ["/bin/bash", "/scripts/reduce_cpu_s1_rl.sh"]
+              command: ["/bin/bash", "/scripts/reduce_cpu_s2_rl.sh"]
               volumeMounts:
                 - name: script-volume
                   mountPath: /scripts
@@ -23,5 +23,5 @@ spec:
           volumes:
             - name: script-volume
               configMap:
-                name: reduce-cpu-s1-rl-script
+                name: reduce-cpu-s2-rl-script
                 defaultMode: 0755

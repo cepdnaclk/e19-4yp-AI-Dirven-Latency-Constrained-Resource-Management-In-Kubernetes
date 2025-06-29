@@ -14,7 +14,7 @@ data:
     CPU_REQUEST=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.requests.cpu}" | sed 's/m//')
 
     # Define minimum allowed CPU (in millicores)
-    CPU_MIN=120
+    CPU_MIN=140
 
     # Calculate new values (reduce by 20m)
     CPU_LIMIT_NEW=$((CPU_LIMIT - 20))

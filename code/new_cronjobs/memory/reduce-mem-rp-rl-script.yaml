@@ -14,7 +14,7 @@ data:
     MEM_REQUEST=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.requests.memory}" | sed 's/Mi//')
 
     # Set minimum allowed memory
-    MEM_MIN=190  # minimum 190Mi
+    MEM_MIN=200  # minimum 200Mi
 
     # Calculate new values
     MEM_LIMIT_NEW=$((MEM_LIMIT - 25))
