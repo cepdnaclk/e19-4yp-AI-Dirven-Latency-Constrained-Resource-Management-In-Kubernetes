@@ -1,20 +1,20 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: reduce-mem-s2-rl-cronjob
+  name: reduce-cpu-hg-rl-cronjob
   namespace: default
 spec:
   schedule: "0 */3 * * *"
-  successfulJobsHistoryLimit: 12
-  failedJobsHistoryLimit: 12
+  successfulJobsHistoryLimit: 6
+  failedJobsHistoryLimit: 6
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-            - name: reduce-mem
+            - name: reduce-cpu
               image: bitnami/kubectl:latest
-              command: ["/bin/bash", "/scripts/reduce_mem_s2_rl.sh"]
+              command: ["/bin/bash", "/scripts/reduce_cpu_hg_rl.sh"]
               volumeMounts:
                 - name: script-volume
                   mountPath: /scripts
@@ -23,5 +23,5 @@ spec:
           volumes:
             - name: script-volume
               configMap:
-                name: reduce-s2-rl-script
+                name: reduce-cpu-hg-rl-script
                 defaultMode: 0755

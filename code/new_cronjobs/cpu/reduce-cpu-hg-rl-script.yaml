@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reduce-cpu-hg-rl-script
+  namespace: default
+data:
+  reduce_cpu_hg_rl.sh: |
+    #!/bin/bash
+    DEPLOYMENT_NAME="hash-gen-deployment"
+    NAMESPACE="default"
+
+    # Get current CPU limits and requests (strip 'm' from values)
+    CPU_LIMIT=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.limits.cpu}" | sed 's/m//')
+    CPU_REQUEST=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.requests.cpu}" | sed 's/m//')
+
+    # Define minimum allowed CPU (in millicores)
+    CPU_MIN=120
+
+    # Calculate new values (reduce by 20m)
+    CPU_LIMIT_NEW=$((CPU_LIMIT - 20))
+    CPU_REQUEST_NEW=$((CPU_REQUEST - 20))
+
+    # Ensure values don't go below minimum
+    if [ "$CPU_LIMIT_NEW" -lt "$CPU_MIN" ]; then
+      CPU_LIMIT_NEW=$CPU_MIN
+    fi
+    if [ "$CPU_REQUEST_NEW" -lt "$CPU_MIN" ]; then
+      CPU_REQUEST_NEW=$CPU_MIN
+    fi
+
+    echo "Reducing CPU settings:"
+    echo "  Limit:   ${CPU_LIMIT}m → ${CPU_LIMIT_NEW}m"
+    echo "  Request: ${CPU_REQUEST}m → ${CPU_REQUEST_NEW}m"
+
+    # Patch both CPU limit and request
+    kubectl patch deployment $DEPLOYMENT_NAME -n $NAMESPACE --type='json' -p="[
+      {\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/resources/limits/cpu\", \"value\": \"${CPU_LIMIT_NEW}m\"},
+      {\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/resources/requests/cpu\", \"value\": \"${CPU_REQUEST_NEW}m\"}
+    ]"
