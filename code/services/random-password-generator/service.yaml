@@ -27,10 +27,10 @@ spec:
             - containerPort: 3003
           resources:
             requests:
-              cpu: "100m"
-              memory: "128Mi"
+              cpu: "300m"
+              memory: "256Mi"
             limits:
-              cpu: "200m"
+              cpu: "300m"
               memory: "256Mi"
 ---
 apiVersion: v1
