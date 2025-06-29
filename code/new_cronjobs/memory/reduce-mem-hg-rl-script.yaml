@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reduce-mem-hg-rl-script
+  namespace: default
+data:
+  reduce_mem_hg_rl.sh: |
+    #!/bin/bash
+    DEPLOYMENT_NAME="hash-gen-deployment"
+    NAMESPACE="default"
+
+    # Get current memory limits and requests
+    MEM_LIMIT=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.limits.memory}" | sed 's/Mi//')
+    MEM_REQUEST=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.requests.memory}" | sed 's/Mi//')
+
+    # Set minimum allowed memory
+    MEM_MIN=190  # minimum 190Mi
+
+    # Calculate new values
+    MEM_LIMIT_NEW=$((MEM_LIMIT - 25))
+    MEM_REQUEST_NEW=$((MEM_REQUEST - 25))
+
+    # Ensure they don't go below the minimum
+    if [ "$MEM_LIMIT_NEW" -lt "$MEM_MIN" ]; then
+      MEM_LIMIT_NEW=$MEM_MIN
+    fi
+    if [ "$MEM_REQUEST_NEW" -lt "$MEM_MIN" ]; then
+      MEM_REQUEST_NEW=$MEM_MIN
+    fi
+
+    echo "Reducing memory:"
+    echo "  Limit:   ${MEM_LIMIT}Mi → ${MEM_LIMIT_NEW}Mi"
+    echo "  Request: ${MEM_REQUEST}Mi → ${MEM_REQUEST_NEW}Mi"
+
+    # Patch both memory limit and request
+    kubectl patch deployment $DEPLOYMENT_NAME -n $NAMESPACE --type='json' -p="[
+      {\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/resources/limits/memory\", \"value\": \"${MEM_LIMIT_NEW}Mi\"},
+      {\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/resources/requests/memory\", \"value\": \"${MEM_REQUEST_NEW}Mi\"}
+    ]"
