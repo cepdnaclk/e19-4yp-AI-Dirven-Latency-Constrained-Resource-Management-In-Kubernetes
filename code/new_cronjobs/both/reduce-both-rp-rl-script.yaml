@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: reduce-both-rp-rl-script
+  namespace: default
+data:
+  reduce_both_rp_rl.sh: |
+    #!/bin/bash
+
+    DEPLOYMENT_NAME="rand-pw-gen-deployment"
+    NAMESPACE="default"
+
+    # CPU reduction
+    CPU_LIMIT=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.limits.cpu}" | sed 's/m//')
+    CPU_REQUEST=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.requests.cpu}" | sed 's/m//')
+    CPU_MIN=140
+    CPU_LIMIT_NEW=$((CPU_LIMIT - 20))
+    CPU_REQUEST_NEW=$((CPU_REQUEST - 20))
+    if [ "$CPU_LIMIT_NEW" -lt "$CPU_MIN" ]; then
+      CPU_LIMIT_NEW=$CPU_MIN
+    fi
+    if [ "$CPU_REQUEST_NEW" -lt "$CPU_MIN" ]; then
+      CPU_REQUEST_NEW=$CPU_MIN
+    fi
+    echo "Reducing CPU:"
+    echo "  Limit:   ${CPU_LIMIT}m → ${CPU_LIMIT_NEW}m"
+    echo "  Request: ${CPU_REQUEST}m → ${CPU_REQUEST_NEW}m"
+
+    # Memory reduction
+    MEM_LIMIT=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.limits.memory}" | sed 's/Mi//')
+    MEM_REQUEST=$(kubectl get deployment $DEPLOYMENT_NAME -n $NAMESPACE -o jsonpath="{.spec.template.spec.containers[0].resources.requests.memory}" | sed 's/Mi//')
+    MEM_MIN=200
+    MEM_LIMIT_NEW=$((MEM_LIMIT - 25))
+    MEM_REQUEST_NEW=$((MEM_REQUEST - 25))
+    if [ "$MEM_LIMIT_NEW" -lt "$MEM_MIN" ]; then
+      MEM_LIMIT_NEW=$MEM_MIN
+    fi
+    if [ "$MEM_REQUEST_NEW" -lt "$MEM_MIN" ]; then
+      MEM_REQUEST_NEW=$MEM_MIN
+    fi
+    echo "Reducing Memory:"
+    echo "  Limit:   ${MEM_LIMIT}Mi → ${MEM_LIMIT_NEW}Mi"
+    echo "  Request: ${MEM_REQUEST}Mi → ${MEM_REQUEST_NEW}Mi"
+
+    # Patch all 4 values
+    kubectl patch deployment $DEPLOYMENT_NAME -n $NAMESPACE --type='json' -p="[
+      {\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/resources/limits/cpu\", \"value\": \"${CPU_LIMIT_NEW}m\"},
+      {\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/resources/requests/cpu\", \"value\": \"${CPU_REQUEST_NEW}m\"},
+      {\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/resources/limits/memory\", \"value\": \"${MEM_LIMIT_NEW}Mi\"},
+      {\"op\": \"replace\", \"path\": \"/spec/template/spec/containers/0/resources/requests/memory\", \"value\": \"${MEM_REQUEST_NEW}Mi\"}
+    ]"
