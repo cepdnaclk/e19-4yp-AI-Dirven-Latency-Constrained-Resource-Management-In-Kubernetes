@@ -27,11 +27,11 @@ spec:
             - containerPort: 3005
           resources:
             requests:
-              cpu: "100m"
-              memory: "128Mi"
+              cpu: "300m"
+              memory: "256Mi"
             limits:
-              cpu: "200m"
-              memory: "300Mi"
+              cpu: "300m"
+              memory: "256Mi"
 ---
 apiVersion: v1
 kind: Service
