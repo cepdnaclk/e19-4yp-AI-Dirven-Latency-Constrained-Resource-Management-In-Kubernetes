@@ -23,5 +23,5 @@ spec:
           volumes:
             - name: script-volume
               configMap:
-                name: reduce-rp-rl-script
+                name: reduce-mem-rp-rl-script
                 defaultMode: 0755
