@@ -6,7 +6,7 @@
         <collectionProp name="Arguments.arguments">
           <elementProp name="BASE_URL" elementType="Argument">
             <stringProp name="Argument.name">BASE_URL</stringProp>
-            <stringProp name="Argument.value">http://192.168.49.101:3001</stringProp>
+            <stringProp name="Argument.value">http://192.168.49.2:32360</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -48,8 +48,8 @@
           <stringProp name="HTTPSampler.connect_timeout"></stringProp>
           <stringProp name="HTTPSampler.response_timeout"></stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
-          <stringProp name="HTTPSampler.domain">192.168.49.101</stringProp>
-          <stringProp name="HTTPSampler.port">3001</stringProp>
+          <stringProp name="HTTPSampler.domain">192.168.49.2</stringProp>
+          <stringProp name="HTTPSampler.port">32360</stringProp>
           <stringProp name="HTTPSampler.path">/isPrime?number=29</stringProp>
         </HTTPSamplerProxy>
         <hashTree/>
