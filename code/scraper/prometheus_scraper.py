@@ -13,7 +13,20 @@ JAVA_SERVICES = [
         "container": "service-1-container",
         "pod": "service-1-deployment-[a-z0-9]+-[a-z0-9]+",
         "namespace": "default"
+    },
+    {
+        "name": "rand-pw-gen-deployment",
+        "container": "rand-pw-gen-container",
+        "pod": "rand-pw-gen-deployment-[a-z0-9]+-[a-z0-9]+",
+        "namespace": "default"
+    },
+    {
+        "name": "hash-gen-deployment",
+        "container": "hash-gen-container",
+        "pod": "hash-gen-deployment-[a-z0-9]+-[a-z0-9]+",
+        "namespace": "default"
     }
+    
 ]
 
 GO_SERVICES = [
