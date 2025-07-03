@@ -12,8 +12,25 @@ JAVA_SERVICES = [
         "name": "service-1-deployment",
         "container": "service-1-container",
         "pod": "service-1-deployment-[a-z0-9]+-[a-z0-9]+",
-        "namespace": "default"
+        "namespace": "default",
+        "app_label": "service-1"
+    },
+    {
+        "name": "rand-pw-gen-deployment",
+        "container": "rand-pw-gen-container",
+        "pod": "rand-pw-gen-deployment-[a-z0-9]+-[a-z0-9]+",
+        "namespace": "default",
+        "app_label": "rand-pw-gen"
+        
+    },
+    {
+        "name": "hash-gen-deployment",
+        "container": "hash-gen-container",
+        "pod": "hash-gen-deployment-[a-z0-9]+-[a-z0-9]+",
+        "namespace": "default",
+        "app_label": "hash-gen"
     }
+    
 ]
 
 GO_SERVICES = [
@@ -66,11 +83,11 @@ def get_container_memory_limit(pod):
     result = query_prometheus(query)
     return result[0]['value'][1]
 
-def get_request_rate_java(pod):
+def get_request_rate_java(pod, app_label):
     query = (
         f'sum(rate(http_server_requests_seconds_count{{'
         f'namespace="default", '
-        f'app="service-1", '
+        f'app="{app_label}", '
         f'pod=~"{pod}", '
         f'outcome="SUCCESS", '
         f'status=~"2.."'
@@ -85,7 +102,7 @@ def get_request_rate_go(pod):
     return float(result[0]['value'][1]) if result else 0
 
 
-def get_latency_java(pod):
+def get_latency_java(pod, app_label):
     # Query for total request time in the last hour
     latency_sum_query = (
         f'sum(rate(http_server_requests_seconds_sum{{pod=~"{pod}"}}[1h])) '
@@ -152,7 +169,8 @@ def scrape_data(service_list, latency_func, interval=30):
             mem_limit = get_container_memory_limit(pod)
 
             # Latency
-            latency = latency_func(pod)
+            app_label = service.get("app_label", "") 
+            latency = latency_func(pod, app_label) if latency_func == get_latency_java else latency_func(pod)
 
             # CPU and Memory Usage
             cpu_result = get_container_cpu_usage(pod)
@@ -168,7 +186,8 @@ def scrape_data(service_list, latency_func, interval=30):
             timestamp = cpu_timestamp if cpu_timestamp != "N/A" else mem_timestamp
             
             # Request rate
-            req_rate = get_request_rate_java(pod) if latency_func == get_latency_java else get_request_rate_go(pod)
+            app_label = service.get("app_label", "")  # fallback in case it's not set
+            req_rate = get_request_rate_java(pod, app_label) if latency_func == get_latency_java else get_request_rate_go(pod)
 
 
             data = [
