@@ -23,7 +23,7 @@ def run_locust_continuously():
         print(f"Starting test with {user_count} users")
 
         # Start Locust in headless mode with the specified user count
-        command = f"locust -f locustfile.py --headless -u {user_count} -r 5 --run-time 30s --host=http://192.168.49.102:3005"
+        command = f"locust -f locustfile.py --headless -u {user_count} -r 5 --run-time 30s --host=http://192.168.49.2:32567"
         os.system(command)  # Execute the command to start the test
         time.sleep(30)  # Adjust the interval of changing users (30 seconds)
 
