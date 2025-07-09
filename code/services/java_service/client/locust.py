@@ -1,4 +1,4 @@
-from locust import HttpUser, task, between, LoadTestShape
+from locust import HttpUser, task, constant, LoadTestShape
 import random
 
 class PrimeUser(HttpUser):
