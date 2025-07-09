@@ -11,8 +11,8 @@ class HashUser(HttpUser):
         random_input = ''.join(random.choices(string.ascii_letters + string.digits, k=20))
         self.client.post(
             "/hash/sha256",
-            data=json.dumps(random_input),
-            headers={"Content-Type": "application/json"}
+            data=random_input,  # send as plain text
+            headers={"Content-Type": "text/plain"}  # correct content type
         )
 
 class StepLoadShape(LoadTestShape):
