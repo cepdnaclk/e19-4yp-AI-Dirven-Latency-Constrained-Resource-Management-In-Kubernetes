@@ -1,4 +1,4 @@
-from locust import HttpUser, task, between, constant, LoadTestShape
+from locust import HttpUser, task, constant, constant, LoadTestShape
 import random
 import string
 import json
