@@ -6,8 +6,8 @@ class PrimeUser(HttpUser):
 
     @task
     def check_prime(self):
-        number = 49 #random.randint(1, 1000)
-        self.client.get(f"/isPrime?number={number}")
+        number = 40 #random.randint(1, 1000)
+        self.client.get(f"/echoNumber?number={number}")
 
 # Define custom load shape
 class StepLoadShape(LoadTestShape):
