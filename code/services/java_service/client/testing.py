@@ -46,7 +46,7 @@ def run_locust_command(user_count=20):
     target_host = "http://192.168.49.2:31662"
 
     command = (
-        f"locust -f locustfile_runner.py --headless "
+        f"locust -f testing.py --headless "
         f"-u {user_count} -r 5 --run-time 30s --host={target_host}"
     )
     print(f"Running: {command}")
