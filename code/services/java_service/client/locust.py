@@ -1,5 +1,7 @@
 from locust import HttpUser, task, constant, LoadTestShape
 import random
+import os
+import time
 
 class PrimeUser(HttpUser):
     wait_time = constant(1)  # Simulate realistic pacing
@@ -38,5 +40,23 @@ class StepLoadShape(LoadTestShape):
             users = self.max_users
 
         return (int(users), int(users))
+    
+# Function to run Locust from inside the script
+def run_locust_command(user_count=20):
+    target_host = "http://192.168.49.2:31662"
+
+    command = (
+        f"locust -f locustfile_runner.py --headless "
+        f"-u {user_count} -r 5 --run-time 30s --host={target_host}"
+    )
+    print(f"Running: {command}")
+    os.system(command)
+
+if __name__ == "__main__":
+    # Run the test repeatedly every 30 seconds
+    while True:
+        run_locust_command(user_count=20)
+        print("Sleeping before next round...\n")
+        time.sleep(30)
     
 # nohup locust -f locust.py --host=http://localhost:3001 --headless > locust.log 2>&1 &
