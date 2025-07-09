@@ -43,7 +43,7 @@ class StepLoadShape(LoadTestShape):
     
 # Function to run Locust from inside the script
 def run_locust_command(user_count=20):
-    target_host = "http://192.168.49.2:31662"
+    target_host = "http://192.168.49.2:32360"
 
     command = (
         f"locust -f testing.py --headless "
