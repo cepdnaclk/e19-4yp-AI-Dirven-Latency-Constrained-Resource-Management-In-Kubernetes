@@ -7,9 +7,13 @@ class PrimeUser(HttpUser):
     @task
     def check_prime(self):
         number = 40 #random.randint(1, 1000)
-        response = self.client.get(f"/echoNumber?number={number}", catch_response=True)
-        if response.status_code != 200:
-            response.failure(f"Status {response.status_code}: {response.text}")
+        with self.client.get(f"/echoNumber?number={number}", catch_response=True) as response:
+            if response.status_code != 200:
+                print(f"Failed with status {response.status_code}: {response.text}")
+                response.failure(f"Status {response.status_code}: {response.text}")
+            else:
+                print(f"Success: {response.text}")
+                response.success()
 
 # Define custom load shape
 class StepLoadShape(LoadTestShape):
