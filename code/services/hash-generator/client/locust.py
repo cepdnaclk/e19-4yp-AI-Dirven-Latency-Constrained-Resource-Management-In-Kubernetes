@@ -2,6 +2,8 @@ from locust import HttpUser, task, constant, constant, LoadTestShape
 import random
 import string
 import json
+import os
+import time
 
 class HashUser(HttpUser):
     wait_time = constant(1)  # 1 second delay between tasks for realism
@@ -42,3 +44,21 @@ class StepLoadShape(LoadTestShape):
             users = self.max_users
 
         return (int(users), int(users))
+    
+# Function to run Locust from inside the script
+def run_locust_command(user_count=20):
+    target_host = "http://192.168.49.2:32567"
+
+    command = (
+        f"locust -f locustfile_runner.py --headless "
+        f"-u {user_count} -r 5 --run-time 30s --host={target_host}"
+    )
+    print(f"Running: {command}")
+    os.system(command)
+
+if __name__ == "__main__":
+    # Run the test repeatedly every 30 seconds
+    while True:
+        run_locust_command(user_count=20)
+        print("Sleeping before next round...\n")
+        time.sleep(30)
