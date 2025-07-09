@@ -11,11 +11,16 @@ class HashUser(HttpUser):
     @task
     def generate_sha256(self):
         random_input = ''.join(random.choices(string.ascii_letters + string.digits, k=20))
-        self.client.post(
+        with self.client.post(
             "/hash/sha256",
             data=random_input,  # send as plain text
-            headers={"Content-Type": "text/plain"}  # correct content type
-        )
+            headers={"Content-Type": "text/plain"},  # correct content type
+            catch_response=True
+        ) as response:
+            if response.status_code != 200:
+                response.failure(f"Status {response.status_code}: {response.text}")
+            else:
+                response.success()
 
 class StepLoadShape(LoadTestShape):
     """
